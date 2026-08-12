@@ -23,6 +23,7 @@ import { Route as OffersRouteImport } from './routes/offers'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReorderRouteImport } from './routes/reorder'
+import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as ReturnsRefundsRouteImport } from './routes/returns-refunds'
 import { Route as SavedListsRouteImport } from './routes/saved-lists'
 import { Route as ScheduleOrdersRouteImport } from './routes/schedule-orders'
@@ -105,6 +106,11 @@ const ReorderRoute = ReorderRouteImport.update({
   path: '/reorder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetailerRoute = RetailerRouteImport.update({
+  id: '/retailer',
+  path: '/retailer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReturnsRefundsRoute = ReturnsRefundsRouteImport.update({
   id: '/returns-refunds',
   path: '/returns-refunds',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reorder': typeof ReorderRoute
+  '/retailer': typeof RetailerRoute
   '/returns-refunds': typeof ReturnsRefundsRoute
   '/saved-lists': typeof SavedListsRoute
   '/schedule-orders': typeof ScheduleOrdersRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reorder': typeof ReorderRoute
+  '/retailer': typeof RetailerRoute
   '/returns-refunds': typeof ReturnsRefundsRoute
   '/saved-lists': typeof SavedListsRoute
   '/schedule-orders': typeof ScheduleOrdersRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reorder': typeof ReorderRoute
+  '/retailer': typeof RetailerRoute
   '/returns-refunds': typeof ReturnsRefundsRoute
   '/saved-lists': typeof SavedListsRoute
   '/schedule-orders': typeof ScheduleOrdersRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/register'
     | '/reorder'
+    | '/retailer'
     | '/returns-refunds'
     | '/saved-lists'
     | '/schedule-orders'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/register'
     | '/reorder'
+    | '/retailer'
     | '/returns-refunds'
     | '/saved-lists'
     | '/schedule-orders'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/register'
     | '/reorder'
+    | '/retailer'
     | '/returns-refunds'
     | '/saved-lists'
     | '/schedule-orders'
@@ -342,6 +354,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   ReorderRoute: typeof ReorderRoute
+  RetailerRoute: typeof RetailerRoute
   ReturnsRefundsRoute: typeof ReturnsRefundsRoute
   SavedListsRoute: typeof SavedListsRoute
   ScheduleOrdersRoute: typeof ScheduleOrdersRoute
@@ -455,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReorderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retailer': {
+      id: '/retailer'
+      path: '/retailer'
+      fullPath: '/retailer'
+      preLoaderRoute: typeof RetailerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/returns-refunds': {
       id: '/returns-refunds'
       path: '/returns-refunds'
@@ -550,6 +570,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   ReorderRoute: ReorderRoute,
+  RetailerRoute: RetailerRoute,
   ReturnsRefundsRoute: ReturnsRefundsRoute,
   SavedListsRoute: SavedListsRoute,
   ScheduleOrdersRoute: ScheduleOrdersRoute,
