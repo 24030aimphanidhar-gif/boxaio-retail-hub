@@ -38,6 +38,9 @@ import { Route as RetailerIndexRouteImport } from './routes/retailer.index'
 import { Route as OrdersIdTrackingRouteImport } from './routes/orders.$id.tracking'
 import { Route as RetailerOrdersIndexRouteImport } from './routes/retailer.orders.index'
 import { Route as RetailerOrdersOrderIdRouteImport } from './routes/retailer.orders.$orderId'
+import { Route as RetailerProductsIndexRouteImport } from './routes/retailer.products.index'
+import { Route as RetailerProductsProductIdRouteImport } from './routes/retailer.products.$productId'
+import { Route as RetailerProductsNewRouteImport } from './routes/retailer.products.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -184,6 +187,22 @@ const RetailerOrdersOrderIdRoute = RetailerOrdersOrderIdRouteImport.update({
   path: '/orders/$orderId',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerProductsIndexRoute = RetailerProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerProductsProductIdRoute =
+  RetailerProductsProductIdRouteImport.update({
+    id: '/products/$productId',
+    path: '/products/$productId',
+    getParentRoute: () => RetailerRoute,
+  } as any)
+const RetailerProductsNewRoute = RetailerProductsNewRouteImport.update({
+  id: '/products/new',
+  path: '/products/new',
+  getParentRoute: () => RetailerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -214,7 +233,10 @@ export interface FileRoutesByFullPath {
   '/retailer/': typeof RetailerIndexRoute
   '/orders/$id/tracking': typeof OrdersIdTrackingRoute
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
+  '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
+  '/retailer/products/new': typeof RetailerProductsNewRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
+  '/retailer/products/': typeof RetailerProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -244,7 +266,10 @@ export interface FileRoutesByTo {
   '/retailer': typeof RetailerIndexRoute
   '/orders/$id/tracking': typeof OrdersIdTrackingRoute
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
+  '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
+  '/retailer/products/new': typeof RetailerProductsNewRoute
   '/retailer/orders': typeof RetailerOrdersIndexRoute
+  '/retailer/products': typeof RetailerProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -276,7 +301,10 @@ export interface FileRoutesById {
   '/retailer/': typeof RetailerIndexRoute
   '/orders/$id/tracking': typeof OrdersIdTrackingRoute
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
+  '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
+  '/retailer/products/new': typeof RetailerProductsNewRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
+  '/retailer/products/': typeof RetailerProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -309,7 +337,10 @@ export interface FileRouteTypes {
     | '/retailer/'
     | '/orders/$id/tracking'
     | '/retailer/orders/$orderId'
+    | '/retailer/products/$productId'
+    | '/retailer/products/new'
     | '/retailer/orders/'
+    | '/retailer/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -339,7 +370,10 @@ export interface FileRouteTypes {
     | '/retailer'
     | '/orders/$id/tracking'
     | '/retailer/orders/$orderId'
+    | '/retailer/products/$productId'
+    | '/retailer/products/new'
     | '/retailer/orders'
+    | '/retailer/products'
   id:
     | '__root__'
     | '/'
@@ -370,7 +404,10 @@ export interface FileRouteTypes {
     | '/retailer/'
     | '/orders/$id/tracking'
     | '/retailer/orders/$orderId'
+    | '/retailer/products/$productId'
+    | '/retailer/products/new'
     | '/retailer/orders/'
+    | '/retailer/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -607,19 +644,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerOrdersOrderIdRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/products/': {
+      id: '/retailer/products/'
+      path: '/products'
+      fullPath: '/retailer/products/'
+      preLoaderRoute: typeof RetailerProductsIndexRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/products/$productId': {
+      id: '/retailer/products/$productId'
+      path: '/products/$productId'
+      fullPath: '/retailer/products/$productId'
+      preLoaderRoute: typeof RetailerProductsProductIdRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/products/new': {
+      id: '/retailer/products/new'
+      path: '/products/new'
+      fullPath: '/retailer/products/new'
+      preLoaderRoute: typeof RetailerProductsNewRouteImport
+      parentRoute: typeof RetailerRoute
+    }
   }
 }
 
 interface RetailerRouteChildren {
   RetailerIndexRoute: typeof RetailerIndexRoute
   RetailerOrdersOrderIdRoute: typeof RetailerOrdersOrderIdRoute
+  RetailerProductsProductIdRoute: typeof RetailerProductsProductIdRoute
+  RetailerProductsNewRoute: typeof RetailerProductsNewRoute
   RetailerOrdersIndexRoute: typeof RetailerOrdersIndexRoute
+  RetailerProductsIndexRoute: typeof RetailerProductsIndexRoute
 }
 
 const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerIndexRoute: RetailerIndexRoute,
   RetailerOrdersOrderIdRoute: RetailerOrdersOrderIdRoute,
+  RetailerProductsProductIdRoute: RetailerProductsProductIdRoute,
+  RetailerProductsNewRoute: RetailerProductsNewRoute,
   RetailerOrdersIndexRoute: RetailerOrdersIndexRoute,
+  RetailerProductsIndexRoute: RetailerProductsIndexRoute,
 }
 
 const RetailerRouteWithChildren = RetailerRoute._addFileChildren(
