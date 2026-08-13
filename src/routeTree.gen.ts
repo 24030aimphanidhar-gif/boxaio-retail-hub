@@ -35,6 +35,7 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as RetailerIndexRouteImport } from './routes/retailer.index'
+import { Route as RetailerBusinessCategoriesRouteImport } from './routes/retailer.business-categories'
 import { Route as RetailerCartRouteImport } from './routes/retailer.cart'
 import { Route as RetailerCatalogueRouteImport } from './routes/retailer.catalogue'
 import { Route as RetailerCategoriesRouteImport } from './routes/retailer.categories'
@@ -194,6 +195,12 @@ const RetailerIndexRoute = RetailerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerBusinessCategoriesRoute =
+  RetailerBusinessCategoriesRouteImport.update({
+    id: '/business-categories',
+    path: '/business-categories',
+    getParentRoute: () => RetailerRoute,
+  } as any)
 const RetailerCartRoute = RetailerCartRouteImport.update({
   id: '/cart',
   path: '/cart',
@@ -360,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
   '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
@@ -415,6 +423,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
   '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
@@ -472,6 +481,7 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
   '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
@@ -530,6 +540,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
     | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
@@ -585,6 +596,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
     | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
@@ -641,6 +653,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
     | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
@@ -887,6 +900,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerIndexRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/business-categories': {
+      id: '/retailer/business-categories'
+      path: '/business-categories'
+      fullPath: '/retailer/business-categories'
+      preLoaderRoute: typeof RetailerBusinessCategoriesRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/cart': {
       id: '/retailer/cart'
       path: '/cart'
@@ -1087,6 +1107,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface RetailerRouteChildren {
+  RetailerBusinessCategoriesRoute: typeof RetailerBusinessCategoriesRoute
   RetailerCartRoute: typeof RetailerCartRoute
   RetailerCatalogueRoute: typeof RetailerCatalogueRoute
   RetailerCategoriesRoute: typeof RetailerCategoriesRoute
@@ -1118,6 +1139,7 @@ interface RetailerRouteChildren {
 }
 
 const RetailerRouteChildren: RetailerRouteChildren = {
+  RetailerBusinessCategoriesRoute: RetailerBusinessCategoriesRoute,
   RetailerCartRoute: RetailerCartRoute,
   RetailerCatalogueRoute: RetailerCatalogueRoute,
   RetailerCategoriesRoute: RetailerCategoriesRoute,
