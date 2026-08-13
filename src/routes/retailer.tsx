@@ -1,8 +1,23 @@
-import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
+import { RetailerNavbar } from "@/components/retailer/RetailerNavbar";
 import { RetailerShell } from "@/retailer/components/RetailerShell";
+import { B2BCartProvider } from "@/retailer/b2b/CartContext";
 import { useRetailerSession } from "@/retailer/hooks";
+
+/** Paths that render the B2B storefront chrome instead of the store dashboard. */
+const STOREFRONT_PATHS = [
+  "/retailer/shop",
+  "/retailer/business-categories",
+  "/retailer/deals",
+  "/retailer/catalogue",
+  "/retailer/my-orders",
+  "/retailer/wishlist",
+  "/retailer/cart",
+  "/retailer/checkout",
+  "/retailer/profile",
+];
 
 export const Route = createFileRoute("/retailer")({
   // Session lives in the browser, so the retailer area renders client-side.
@@ -28,6 +43,9 @@ export const Route = createFileRoute("/retailer")({
 
 function RetailerLayout() {
   const { ready, isRetailer, isAdmin, store, user } = useRetailerSession();
+  const { pathname } = useLocation();
+  const isStorefront =
+    pathname === "/retailer" || STOREFRONT_PATHS.some((p) => pathname.startsWith(p));
 
   if (!ready) {
     return (
@@ -69,8 +87,17 @@ function RetailerLayout() {
   }
 
   return (
-    <RetailerShell>
-      <Outlet />
-    </RetailerShell>
+    <B2BCartProvider>
+      {isStorefront ? (
+        <div className="min-h-screen bg-background">
+          <RetailerNavbar />
+          <Outlet />
+        </div>
+      ) : (
+        <RetailerShell>
+          <Outlet />
+        </RetailerShell>
+      )}
+    </B2BCartProvider>
   );
 }

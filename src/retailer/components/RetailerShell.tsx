@@ -45,7 +45,10 @@ interface NavSection {
 const SECTIONS: NavSection[] = [
   {
     title: "Overview",
-    items: [{ label: "Dashboard", to: "/retailer", icon: Home, exact: true }],
+    items: [
+      { label: "Back to B2B storefront", to: "/retailer", icon: Home, exact: true },
+      { label: "Dashboard", to: "/retailer/dashboard", icon: BarChart3 },
+    ],
   },
   {
     title: "Store Management",

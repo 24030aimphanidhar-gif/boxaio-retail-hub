@@ -35,19 +35,29 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as RetailerIndexRouteImport } from './routes/retailer.index'
+import { Route as RetailerBusinessCategoriesRouteImport } from './routes/retailer.business-categories'
+import { Route as RetailerCartRouteImport } from './routes/retailer.cart'
+import { Route as RetailerCatalogueRouteImport } from './routes/retailer.catalogue'
 import { Route as RetailerCategoriesRouteImport } from './routes/retailer.categories'
+import { Route as RetailerCheckoutRouteImport } from './routes/retailer.checkout'
 import { Route as RetailerCustomersRouteImport } from './routes/retailer.customers'
+import { Route as RetailerDashboardRouteImport } from './routes/retailer.dashboard'
+import { Route as RetailerDealsRouteImport } from './routes/retailer.deals'
 import { Route as RetailerDeliveryRouteImport } from './routes/retailer.delivery'
 import { Route as RetailerHoursRouteImport } from './routes/retailer.hours'
 import { Route as RetailerInventoryRouteImport } from './routes/retailer.inventory'
 import { Route as RetailerLocationRouteImport } from './routes/retailer.location'
+import { Route as RetailerMyOrdersRouteImport } from './routes/retailer.my-orders'
 import { Route as RetailerNotificationsRouteImport } from './routes/retailer.notifications'
 import { Route as RetailerOffersRouteImport } from './routes/retailer.offers'
+import { Route as RetailerProfileRouteImport } from './routes/retailer.profile'
 import { Route as RetailerReturnsRouteImport } from './routes/retailer.returns'
 import { Route as RetailerReviewsRouteImport } from './routes/retailer.reviews'
 import { Route as RetailerSalesRouteImport } from './routes/retailer.sales'
 import { Route as RetailerSettingsRouteImport } from './routes/retailer.settings'
+import { Route as RetailerShopRouteImport } from './routes/retailer.shop'
 import { Route as RetailerStoreRouteImport } from './routes/retailer.store'
+import { Route as RetailerWishlistRouteImport } from './routes/retailer.wishlist'
 import { Route as OrdersIdTrackingRouteImport } from './routes/orders.$id.tracking'
 import { Route as RetailerOrdersIndexRouteImport } from './routes/retailer.orders.index'
 import { Route as RetailerOrdersOrderIdRouteImport } from './routes/retailer.orders.$orderId'
@@ -185,14 +195,45 @@ const RetailerIndexRoute = RetailerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerBusinessCategoriesRoute =
+  RetailerBusinessCategoriesRouteImport.update({
+    id: '/business-categories',
+    path: '/business-categories',
+    getParentRoute: () => RetailerRoute,
+  } as any)
+const RetailerCartRoute = RetailerCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerCatalogueRoute = RetailerCatalogueRouteImport.update({
+  id: '/catalogue',
+  path: '/catalogue',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerCategoriesRoute = RetailerCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerCheckoutRoute = RetailerCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerCustomersRoute = RetailerCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerDashboardRoute = RetailerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerDealsRoute = RetailerDealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
   getParentRoute: () => RetailerRoute,
 } as any)
 const RetailerDeliveryRoute = RetailerDeliveryRouteImport.update({
@@ -215,6 +256,11 @@ const RetailerLocationRoute = RetailerLocationRouteImport.update({
   path: '/location',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerMyOrdersRoute = RetailerMyOrdersRouteImport.update({
+  id: '/my-orders',
+  path: '/my-orders',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerNotificationsRoute = RetailerNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -223,6 +269,11 @@ const RetailerNotificationsRoute = RetailerNotificationsRouteImport.update({
 const RetailerOffersRoute = RetailerOffersRouteImport.update({
   id: '/offers',
   path: '/offers',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerProfileRoute = RetailerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => RetailerRoute,
 } as any)
 const RetailerReturnsRoute = RetailerReturnsRouteImport.update({
@@ -245,9 +296,19 @@ const RetailerSettingsRoute = RetailerSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerShopRoute = RetailerShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerStoreRoute = RetailerStoreRouteImport.update({
   id: '/store',
   path: '/store',
+  getParentRoute: () => RetailerRoute,
+} as any)
+const RetailerWishlistRoute = RetailerWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => RetailerRoute,
 } as any)
 const OrdersIdTrackingRoute = OrdersIdTrackingRouteImport.update({
@@ -306,19 +367,29 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
+  '/retailer/cart': typeof RetailerCartRoute
+  '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
+  '/retailer/checkout': typeof RetailerCheckoutRoute
   '/retailer/customers': typeof RetailerCustomersRoute
+  '/retailer/dashboard': typeof RetailerDashboardRoute
+  '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
+  '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
+  '/retailer/wishlist': typeof RetailerWishlistRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/retailer/': typeof RetailerIndexRoute
@@ -352,19 +423,29 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
+  '/retailer/cart': typeof RetailerCartRoute
+  '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
+  '/retailer/checkout': typeof RetailerCheckoutRoute
   '/retailer/customers': typeof RetailerCustomersRoute
+  '/retailer/dashboard': typeof RetailerDashboardRoute
+  '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
+  '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
+  '/retailer/wishlist': typeof RetailerWishlistRoute
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
   '/retailer': typeof RetailerIndexRoute
@@ -400,19 +481,29 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/business-categories': typeof RetailerBusinessCategoriesRoute
+  '/retailer/cart': typeof RetailerCartRoute
+  '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
+  '/retailer/checkout': typeof RetailerCheckoutRoute
   '/retailer/customers': typeof RetailerCustomersRoute
+  '/retailer/dashboard': typeof RetailerDashboardRoute
+  '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
+  '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
+  '/retailer/wishlist': typeof RetailerWishlistRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/retailer/': typeof RetailerIndexRoute
@@ -449,19 +540,29 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
+    | '/retailer/cart'
+    | '/retailer/catalogue'
     | '/retailer/categories'
+    | '/retailer/checkout'
     | '/retailer/customers'
+    | '/retailer/dashboard'
+    | '/retailer/deals'
     | '/retailer/delivery'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
+    | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
+    | '/retailer/wishlist'
     | '/orders/'
     | '/products/'
     | '/retailer/'
@@ -495,19 +596,29 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
+    | '/retailer/cart'
+    | '/retailer/catalogue'
     | '/retailer/categories'
+    | '/retailer/checkout'
     | '/retailer/customers'
+    | '/retailer/dashboard'
+    | '/retailer/deals'
     | '/retailer/delivery'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
+    | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
+    | '/retailer/wishlist'
     | '/orders'
     | '/products'
     | '/retailer'
@@ -542,19 +653,29 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/business-categories'
+    | '/retailer/cart'
+    | '/retailer/catalogue'
     | '/retailer/categories'
+    | '/retailer/checkout'
     | '/retailer/customers'
+    | '/retailer/dashboard'
+    | '/retailer/deals'
     | '/retailer/delivery'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
+    | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
+    | '/retailer/wishlist'
     | '/orders/'
     | '/products/'
     | '/retailer/'
@@ -779,6 +900,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerIndexRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/business-categories': {
+      id: '/retailer/business-categories'
+      path: '/business-categories'
+      fullPath: '/retailer/business-categories'
+      preLoaderRoute: typeof RetailerBusinessCategoriesRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/cart': {
+      id: '/retailer/cart'
+      path: '/cart'
+      fullPath: '/retailer/cart'
+      preLoaderRoute: typeof RetailerCartRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/catalogue': {
+      id: '/retailer/catalogue'
+      path: '/catalogue'
+      fullPath: '/retailer/catalogue'
+      preLoaderRoute: typeof RetailerCatalogueRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/categories': {
       id: '/retailer/categories'
       path: '/categories'
@@ -786,11 +928,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerCategoriesRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/checkout': {
+      id: '/retailer/checkout'
+      path: '/checkout'
+      fullPath: '/retailer/checkout'
+      preLoaderRoute: typeof RetailerCheckoutRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/customers': {
       id: '/retailer/customers'
       path: '/customers'
       fullPath: '/retailer/customers'
       preLoaderRoute: typeof RetailerCustomersRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/dashboard': {
+      id: '/retailer/dashboard'
+      path: '/dashboard'
+      fullPath: '/retailer/dashboard'
+      preLoaderRoute: typeof RetailerDashboardRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/deals': {
+      id: '/retailer/deals'
+      path: '/deals'
+      fullPath: '/retailer/deals'
+      preLoaderRoute: typeof RetailerDealsRouteImport
       parentRoute: typeof RetailerRoute
     }
     '/retailer/delivery': {
@@ -821,6 +984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerLocationRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/my-orders': {
+      id: '/retailer/my-orders'
+      path: '/my-orders'
+      fullPath: '/retailer/my-orders'
+      preLoaderRoute: typeof RetailerMyOrdersRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/notifications': {
       id: '/retailer/notifications'
       path: '/notifications'
@@ -833,6 +1003,13 @@ declare module '@tanstack/react-router' {
       path: '/offers'
       fullPath: '/retailer/offers'
       preLoaderRoute: typeof RetailerOffersRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/profile': {
+      id: '/retailer/profile'
+      path: '/profile'
+      fullPath: '/retailer/profile'
+      preLoaderRoute: typeof RetailerProfileRouteImport
       parentRoute: typeof RetailerRoute
     }
     '/retailer/returns': {
@@ -863,11 +1040,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerSettingsRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/shop': {
+      id: '/retailer/shop'
+      path: '/shop'
+      fullPath: '/retailer/shop'
+      preLoaderRoute: typeof RetailerShopRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/store': {
       id: '/retailer/store'
       path: '/store'
       fullPath: '/retailer/store'
       preLoaderRoute: typeof RetailerStoreRouteImport
+      parentRoute: typeof RetailerRoute
+    }
+    '/retailer/wishlist': {
+      id: '/retailer/wishlist'
+      path: '/wishlist'
+      fullPath: '/retailer/wishlist'
+      preLoaderRoute: typeof RetailerWishlistRouteImport
       parentRoute: typeof RetailerRoute
     }
     '/orders/$id/tracking': {
@@ -916,19 +1107,29 @@ declare module '@tanstack/react-router' {
 }
 
 interface RetailerRouteChildren {
+  RetailerBusinessCategoriesRoute: typeof RetailerBusinessCategoriesRoute
+  RetailerCartRoute: typeof RetailerCartRoute
+  RetailerCatalogueRoute: typeof RetailerCatalogueRoute
   RetailerCategoriesRoute: typeof RetailerCategoriesRoute
+  RetailerCheckoutRoute: typeof RetailerCheckoutRoute
   RetailerCustomersRoute: typeof RetailerCustomersRoute
+  RetailerDashboardRoute: typeof RetailerDashboardRoute
+  RetailerDealsRoute: typeof RetailerDealsRoute
   RetailerDeliveryRoute: typeof RetailerDeliveryRoute
   RetailerHoursRoute: typeof RetailerHoursRoute
   RetailerInventoryRoute: typeof RetailerInventoryRoute
   RetailerLocationRoute: typeof RetailerLocationRoute
+  RetailerMyOrdersRoute: typeof RetailerMyOrdersRoute
   RetailerNotificationsRoute: typeof RetailerNotificationsRoute
   RetailerOffersRoute: typeof RetailerOffersRoute
+  RetailerProfileRoute: typeof RetailerProfileRoute
   RetailerReturnsRoute: typeof RetailerReturnsRoute
   RetailerReviewsRoute: typeof RetailerReviewsRoute
   RetailerSalesRoute: typeof RetailerSalesRoute
   RetailerSettingsRoute: typeof RetailerSettingsRoute
+  RetailerShopRoute: typeof RetailerShopRoute
   RetailerStoreRoute: typeof RetailerStoreRoute
+  RetailerWishlistRoute: typeof RetailerWishlistRoute
   RetailerIndexRoute: typeof RetailerIndexRoute
   RetailerOrdersOrderIdRoute: typeof RetailerOrdersOrderIdRoute
   RetailerProductsProductIdRoute: typeof RetailerProductsProductIdRoute
@@ -938,19 +1139,29 @@ interface RetailerRouteChildren {
 }
 
 const RetailerRouteChildren: RetailerRouteChildren = {
+  RetailerBusinessCategoriesRoute: RetailerBusinessCategoriesRoute,
+  RetailerCartRoute: RetailerCartRoute,
+  RetailerCatalogueRoute: RetailerCatalogueRoute,
   RetailerCategoriesRoute: RetailerCategoriesRoute,
+  RetailerCheckoutRoute: RetailerCheckoutRoute,
   RetailerCustomersRoute: RetailerCustomersRoute,
+  RetailerDashboardRoute: RetailerDashboardRoute,
+  RetailerDealsRoute: RetailerDealsRoute,
   RetailerDeliveryRoute: RetailerDeliveryRoute,
   RetailerHoursRoute: RetailerHoursRoute,
   RetailerInventoryRoute: RetailerInventoryRoute,
   RetailerLocationRoute: RetailerLocationRoute,
+  RetailerMyOrdersRoute: RetailerMyOrdersRoute,
   RetailerNotificationsRoute: RetailerNotificationsRoute,
   RetailerOffersRoute: RetailerOffersRoute,
+  RetailerProfileRoute: RetailerProfileRoute,
   RetailerReturnsRoute: RetailerReturnsRoute,
   RetailerReviewsRoute: RetailerReviewsRoute,
   RetailerSalesRoute: RetailerSalesRoute,
   RetailerSettingsRoute: RetailerSettingsRoute,
+  RetailerShopRoute: RetailerShopRoute,
   RetailerStoreRoute: RetailerStoreRoute,
+  RetailerWishlistRoute: RetailerWishlistRoute,
   RetailerIndexRoute: RetailerIndexRoute,
   RetailerOrdersOrderIdRoute: RetailerOrdersOrderIdRoute,
   RetailerProductsProductIdRoute: RetailerProductsProductIdRoute,
@@ -994,3 +1205,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
