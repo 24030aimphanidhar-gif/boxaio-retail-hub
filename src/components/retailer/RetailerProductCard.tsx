@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ShoppingCart, Tag } from "lucide-react";
+import { Heart, ShoppingCart, Tag } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BulkQuantitySelector } from "@/components/retailer/BulkQuantitySelector";
 import { useB2BCart } from "@/retailer/b2b/CartContext";
+import { useB2BWishlist } from "@/retailer/b2b/wishlist";
 import type { B2BProduct } from "@/retailer/b2b/types";
 
 export function StockPill({ stock }: { stock: number }) {
@@ -32,6 +33,7 @@ export function RetailerProductCard({
   footer?: React.ReactNode;
 }) {
   const { addBulkToCart } = useB2BCart();
+  const { has, toggle } = useB2BWishlist();
   const [qty, setQty] = useState(product.moq);
   const discount = Math.max(0, Math.round(((product.mrp - product.b2bPrice) / product.mrp) * 100));
 
@@ -49,6 +51,14 @@ export function RetailerProductCard({
             {discount}% OFF
           </span>
         ) : null}
+        <button
+          type="button"
+          aria-label="Save to business wishlist"
+          onClick={() => toggle(product.id)}
+          className="absolute right-2 top-2 rounded-full bg-background/90 p-1.5 shadow-sm"
+        >
+          <Heart className={has(product.id) ? "size-4 fill-primary text-primary" : "size-4 text-muted-foreground"} />
+        </button>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
