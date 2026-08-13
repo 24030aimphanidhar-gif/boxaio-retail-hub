@@ -43,6 +43,9 @@ export const Route = createFileRoute("/retailer")({
 
 function RetailerLayout() {
   const { ready, isRetailer, isAdmin, store, user } = useRetailerSession();
+  const { pathname } = useLocation();
+  const isStorefront =
+    pathname === "/retailer" || STOREFRONT_PATHS.some((p) => pathname.startsWith(p));
 
   if (!ready) {
     return (
@@ -84,8 +87,17 @@ function RetailerLayout() {
   }
 
   return (
-    <RetailerShell>
-      <Outlet />
-    </RetailerShell>
+    <B2BCartProvider>
+      {isStorefront ? (
+        <div className="min-h-screen bg-background">
+          <RetailerNavbar />
+          <Outlet />
+        </div>
+      ) : (
+        <RetailerShell>
+          <Outlet />
+        </RetailerShell>
+      )}
+    </B2BCartProvider>
   );
 }
