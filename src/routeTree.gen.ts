@@ -48,6 +48,7 @@ import { Route as RetailerReturnsRouteImport } from './routes/retailer.returns'
 import { Route as RetailerReviewsRouteImport } from './routes/retailer.reviews'
 import { Route as RetailerSalesRouteImport } from './routes/retailer.sales'
 import { Route as RetailerSettingsRouteImport } from './routes/retailer.settings'
+import { Route as RetailerShopRouteImport } from './routes/retailer.shop'
 import { Route as RetailerStoreRouteImport } from './routes/retailer.store'
 import { Route as OrdersIdTrackingRouteImport } from './routes/orders.$id.tracking'
 import { Route as RetailerOrdersIndexRouteImport } from './routes/retailer.orders.index'
@@ -251,6 +252,11 @@ const RetailerSettingsRoute = RetailerSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerShopRoute = RetailerShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerStoreRoute = RetailerStoreRouteImport.update({
   id: '/store',
   path: '/store',
@@ -325,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
@@ -372,6 +379,7 @@ export interface FileRoutesByTo {
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
@@ -421,6 +429,7 @@ export interface FileRoutesById {
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
   '/retailer/settings': typeof RetailerSettingsRoute
+  '/retailer/shop': typeof RetailerShopRoute
   '/retailer/store': typeof RetailerStoreRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
@@ -471,6 +480,7 @@ export interface FileRouteTypes {
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
     | '/orders/'
     | '/products/'
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
     | '/orders'
     | '/products'
@@ -566,6 +577,7 @@ export interface FileRouteTypes {
     | '/retailer/reviews'
     | '/retailer/sales'
     | '/retailer/settings'
+    | '/retailer/shop'
     | '/retailer/store'
     | '/orders/'
     | '/products/'
@@ -882,6 +894,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerSettingsRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/shop': {
+      id: '/retailer/shop'
+      path: '/shop'
+      fullPath: '/retailer/shop'
+      preLoaderRoute: typeof RetailerShopRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/store': {
       id: '/retailer/store'
       path: '/store'
@@ -948,6 +967,7 @@ interface RetailerRouteChildren {
   RetailerReviewsRoute: typeof RetailerReviewsRoute
   RetailerSalesRoute: typeof RetailerSalesRoute
   RetailerSettingsRoute: typeof RetailerSettingsRoute
+  RetailerShopRoute: typeof RetailerShopRoute
   RetailerStoreRoute: typeof RetailerStoreRoute
   RetailerIndexRoute: typeof RetailerIndexRoute
   RetailerOrdersOrderIdRoute: typeof RetailerOrdersOrderIdRoute
@@ -971,6 +991,7 @@ const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerReviewsRoute: RetailerReviewsRoute,
   RetailerSalesRoute: RetailerSalesRoute,
   RetailerSettingsRoute: RetailerSettingsRoute,
+  RetailerShopRoute: RetailerShopRoute,
   RetailerStoreRoute: RetailerStoreRoute,
   RetailerIndexRoute: RetailerIndexRoute,
   RetailerOrdersOrderIdRoute: RetailerOrdersOrderIdRoute,
