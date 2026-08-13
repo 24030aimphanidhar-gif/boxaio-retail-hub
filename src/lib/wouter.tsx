@@ -3,7 +3,7 @@
  * BOXAIO pages onto TanStack Router. Aliased as "wouter" in vite/tsconfig so
  * existing page code keeps working without a second router.
  */
-import { useRouter, useRouterState, useParams as useTanStackParams } from "@tanstack/react-router";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { forwardRef, type AnchorHTMLAttributes, type MouseEvent } from "react";
 
 function isModifiedEvent(event: MouseEvent<HTMLAnchorElement>) {
