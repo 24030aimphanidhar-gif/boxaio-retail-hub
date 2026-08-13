@@ -35,6 +35,7 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as RetailerIndexRouteImport } from './routes/retailer.index'
+import { Route as RetailerCartRouteImport } from './routes/retailer.cart'
 import { Route as RetailerCatalogueRouteImport } from './routes/retailer.catalogue'
 import { Route as RetailerCategoriesRouteImport } from './routes/retailer.categories'
 import { Route as RetailerCustomersRouteImport } from './routes/retailer.customers'
@@ -188,6 +189,11 @@ const RetailerIndexRoute = RetailerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerCartRoute = RetailerCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerCatalogueRoute = RetailerCatalogueRouteImport.update({
   id: '/catalogue',
   path: '/catalogue',
@@ -324,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
   '/retailer/customers': typeof RetailerCustomersRoute
@@ -373,6 +380,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
   '/retailer/customers': typeof RetailerCustomersRoute
@@ -424,6 +432,7 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/product/$id': typeof ProductIdRoute
   '/products/$id': typeof ProductsIdRoute
+  '/retailer/cart': typeof RetailerCartRoute
   '/retailer/catalogue': typeof RetailerCatalogueRoute
   '/retailer/categories': typeof RetailerCategoriesRoute
   '/retailer/customers': typeof RetailerCustomersRoute
@@ -476,6 +485,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
     | '/retailer/customers'
@@ -525,6 +535,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
     | '/retailer/customers'
@@ -575,6 +586,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/product/$id'
     | '/products/$id'
+    | '/retailer/cart'
     | '/retailer/catalogue'
     | '/retailer/categories'
     | '/retailer/customers'
@@ -815,6 +827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerIndexRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/cart': {
+      id: '/retailer/cart'
+      path: '/cart'
+      fullPath: '/retailer/cart'
+      preLoaderRoute: typeof RetailerCartRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/catalogue': {
       id: '/retailer/catalogue'
       path: '/catalogue'
@@ -973,6 +992,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface RetailerRouteChildren {
+  RetailerCartRoute: typeof RetailerCartRoute
   RetailerCatalogueRoute: typeof RetailerCatalogueRoute
   RetailerCategoriesRoute: typeof RetailerCategoriesRoute
   RetailerCustomersRoute: typeof RetailerCustomersRoute
@@ -998,6 +1018,7 @@ interface RetailerRouteChildren {
 }
 
 const RetailerRouteChildren: RetailerRouteChildren = {
+  RetailerCartRoute: RetailerCartRoute,
   RetailerCatalogueRoute: RetailerCatalogueRoute,
   RetailerCategoriesRoute: RetailerCategoriesRoute,
   RetailerCustomersRoute: RetailerCustomersRoute,
