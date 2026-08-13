@@ -48,6 +48,7 @@ import { Route as RetailerLocationRouteImport } from './routes/retailer.location
 import { Route as RetailerMyOrdersRouteImport } from './routes/retailer.my-orders'
 import { Route as RetailerNotificationsRouteImport } from './routes/retailer.notifications'
 import { Route as RetailerOffersRouteImport } from './routes/retailer.offers'
+import { Route as RetailerProfileRouteImport } from './routes/retailer.profile'
 import { Route as RetailerReturnsRouteImport } from './routes/retailer.returns'
 import { Route as RetailerReviewsRouteImport } from './routes/retailer.reviews'
 import { Route as RetailerSalesRouteImport } from './routes/retailer.sales'
@@ -257,6 +258,11 @@ const RetailerOffersRoute = RetailerOffersRouteImport.update({
   path: '/offers',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerProfileRoute = RetailerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => RetailerRoute,
+} as any)
 const RetailerReturnsRoute = RetailerReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
@@ -361,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
@@ -414,6 +421,7 @@ export interface FileRoutesByTo {
   '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
@@ -469,6 +477,7 @@ export interface FileRoutesById {
   '/retailer/my-orders': typeof RetailerMyOrdersRoute
   '/retailer/notifications': typeof RetailerNotificationsRoute
   '/retailer/offers': typeof RetailerOffersRoute
+  '/retailer/profile': typeof RetailerProfileRoute
   '/retailer/returns': typeof RetailerReturnsRoute
   '/retailer/reviews': typeof RetailerReviewsRoute
   '/retailer/sales': typeof RetailerSalesRoute
@@ -525,6 +534,7 @@ export interface FileRouteTypes {
     | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
@@ -578,6 +588,7 @@ export interface FileRouteTypes {
     | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
@@ -632,6 +643,7 @@ export interface FileRouteTypes {
     | '/retailer/my-orders'
     | '/retailer/notifications'
     | '/retailer/offers'
+    | '/retailer/profile'
     | '/retailer/returns'
     | '/retailer/reviews'
     | '/retailer/sales'
@@ -954,6 +966,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerOffersRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/profile': {
+      id: '/retailer/profile'
+      path: '/profile'
+      fullPath: '/retailer/profile'
+      preLoaderRoute: typeof RetailerProfileRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/returns': {
       id: '/retailer/returns'
       path: '/returns'
@@ -1062,6 +1081,7 @@ interface RetailerRouteChildren {
   RetailerMyOrdersRoute: typeof RetailerMyOrdersRoute
   RetailerNotificationsRoute: typeof RetailerNotificationsRoute
   RetailerOffersRoute: typeof RetailerOffersRoute
+  RetailerProfileRoute: typeof RetailerProfileRoute
   RetailerReturnsRoute: typeof RetailerReturnsRoute
   RetailerReviewsRoute: typeof RetailerReviewsRoute
   RetailerSalesRoute: typeof RetailerSalesRoute
@@ -1091,6 +1111,7 @@ const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerMyOrdersRoute: RetailerMyOrdersRoute,
   RetailerNotificationsRoute: RetailerNotificationsRoute,
   RetailerOffersRoute: RetailerOffersRoute,
+  RetailerProfileRoute: RetailerProfileRoute,
   RetailerReturnsRoute: RetailerReturnsRoute,
   RetailerReviewsRoute: RetailerReviewsRoute,
   RetailerSalesRoute: RetailerSalesRoute,
