@@ -55,7 +55,10 @@ export interface B2BOrderItem {
   unitPrice: number;
   unit: string;
   image: string;
+  /** Distributor that supplied this line, when chosen from a distributor offer. */
+  distributor?: string;
 }
+
 
 export type B2BOrderStatus = "placed" | "packed" | "shipped" | "delivered" | "cancelled";
 
