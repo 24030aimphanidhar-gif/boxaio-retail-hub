@@ -6,6 +6,20 @@
  * models the retailer's own store management area.
  */
 
+/** A supplier offer attached to a B2B product. */
+export interface DistributorOffer {
+  distributorId: string;
+  distributorName: string;
+  /** Distributor-specific selling price per unit. */
+  price: number;
+  /** Retailer margin against MRP, in percent. */
+  marginPct: number;
+  freeDelivery: boolean;
+  stock: number;
+  /** e.g. "Tomorrow" */
+  deliveryEstimate: string;
+}
+
 export interface B2BProduct {
   id: string;
   name: string;
@@ -26,7 +40,12 @@ export interface B2BProduct {
   sku: string;
   offer?: string;
   description: string;
+  /** Selectable pack sizes shown on distributor listings. */
+  packSizes: string[];
+  /** One or more distributor offers for this product. */
+  offers: DistributorOffer[];
 }
+
 
 export interface B2BOrderItem {
   productId: string;
