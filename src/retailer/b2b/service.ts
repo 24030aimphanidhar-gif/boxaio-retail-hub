@@ -28,10 +28,44 @@ const OFFERS = [
   "Festive wholesale deal",
 ];
 
+/** The distributors BOXAIO buys wholesale stock from. Single source of truth. */
+export const DISTRIBUTORS = [
+  { id: "sai-trade", name: "SAI TRADE" },
+  { id: "sgbl", name: "SGBL" },
+  { id: "ra-agro", name: "RA AGRO" },
+] as const;
+
+export function getDistributor(id: string) {
+  return DISTRIBUTORS.find((d) => d.id === id) ?? null;
+}
+
+const PACK_SIZES = ["500 Ml", "1 Ltr", "2 Ltr", "5 Ltr", "15 Ltr"];
+
+function buildOffers(index: number, basePrice: number, mrp: number, stock: number) {
+  // Deterministic: every product gets 1–3 distributor offers with slightly
+  // different pricing so retailers can compare suppliers.
+  const count = 1 + Math.floor(rand(index + 21) * 3);
+  const start = index % DISTRIBUTORS.length;
+  return Array.from({ length: count }, (_, k) => {
+    const d = DISTRIBUTORS[(start + k) % DISTRIBUTORS.length]!;
+    const price = Math.round((basePrice * (1 + (k - 0.5) * 0.012)) * 100) / 100;
+    return {
+      distributorId: d.id,
+      distributorName: d.name,
+      price,
+      marginPct: Math.max(2, Math.round(((mrp - price) / Math.max(mrp, 1)) * 100)),
+      freeDelivery: rand(index + k + 31) > 0.25,
+      stock: Math.max(0, Math.round(stock * (0.6 + rand(index + k + 41) * 0.4))),
+      deliveryEstimate: rand(index + k + 51) > 0.5 ? "Tomorrow" : "In 2 days",
+    };
+  });
+}
+
 /** Live wholesale catalogue. Always computed — never cached with a price. */
 export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
   const moq = Math.max(2, p.bulkMinQty || 10);
   const stockBase = Math.floor(rand(i + 3) * 400);
+  const stock = p.inStock ? stockBase : 0;
   return {
     id: p._id,
     name: p.name,
@@ -44,10 +78,15 @@ export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
     unit: p.bulkUnit,
     moq,
     increment: Math.max(1, Math.round(moq / 2)),
-    stock: p.inStock ? stockBase : 0,
+    stock,
     sku: `BX-${p._id.replace("prod_", "").toUpperCase()}`,
     ...(rand(i + 11) > 0.72 ? { offer: OFFERS[i % OFFERS.length]! } : {}),
     description: p.description,
+    packSizes: [p.bulkUnit, ...PACK_SIZES.filter((s) => s !== p.bulkUnit)].slice(
+      0,
+      2 + Math.floor(rand(i + 61) * 3),
+    ),
+    offers: buildOffers(i, p.bulkPrice, p.mrp, stock),
   };
 });
 
@@ -57,7 +96,13 @@ export function getB2BProduct(id: string) {
   return PRODUCT_INDEX.get(id) ?? null;
 }
 
+/** Products supplied by a given distributor. */
+export function productsByDistributor(distributorId: string) {
+  return B2B_PRODUCTS.filter((p) => p.offers.some((o) => o.distributorId === distributorId));
+}
+
 export const B2B_CATEGORIES = [...new Set(B2B_PRODUCTS.map((p) => p.category))].sort();
+
 
 /* ------------------------------------------------------------------ orders */
 

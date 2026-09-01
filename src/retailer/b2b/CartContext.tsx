@@ -2,13 +2,15 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 import { useAuth } from "@/context/AuthContext";
 
-import { clampBulkQty, type B2BOrderItem, type B2BProduct } from "./types";
+import { clampBulkQty, type B2BOrderItem, type B2BProduct, type DistributorOffer } from "./types";
 
 /**
  * B2B (bulk) cart — completely separate from the B2C `CartContext` so the two
  * shopping experiences never mix. Persisted per retailer account.
  */
 export interface B2BCartItem {
+  /** Unique line key: product + distributor (same product from two suppliers = two lines). */
+  key: string;
   productId: string;
   name: string;
   image: string;
@@ -18,13 +20,15 @@ export interface B2BCartItem {
   price: number;
   moq: number;
   offer?: string;
+  distributorId?: string;
+  distributorName?: string;
 }
 
 interface B2BCartContextType {
   items: B2BCartItem[];
-  addBulkToCart: (product: B2BProduct, quantity: number) => void;
-  setQuantity: (productId: string, quantity: number) => void;
-  removeItem: (productId: string) => void;
+  addBulkToCart: (product: B2BProduct, quantity: number, offer?: DistributorOffer) => void;
+  setQuantity: (key: string, quantity: number) => void;
+  removeItem: (key: string) => void;
   clearCart: () => void;
   count: number;
   subtotal: number;
@@ -32,6 +36,9 @@ interface B2BCartContextType {
 }
 
 const B2BCartContext = createContext<B2BCartContextType | undefined>(undefined);
+
+const lineKey = (productId: string, distributorId?: string) =>
+  distributorId ? `${productId}::${distributorId}` : productId;
 
 export function B2BCartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -43,7 +50,9 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
     setHydrated(false);
     try {
       const raw = localStorage.getItem(key);
-      setItems(raw ? (JSON.parse(raw) as B2BCartItem[]) : []);
+      const parsed = raw ? (JSON.parse(raw) as B2BCartItem[]) : [];
+      // Backwards compatible with carts saved before distributor support.
+      setItems(parsed.map((i) => ({ ...i, key: i.key ?? i.productId })));
     } catch {
       setItems([]);
     }
@@ -56,28 +65,32 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
   }, [items, key, hydrated]);
 
   const value = useMemo<B2BCartContextType>(() => {
-    const addBulkToCart = (product: B2BProduct, quantity: number) => {
+    const addBulkToCart = (product: B2BProduct, quantity: number, offer?: DistributorOffer) => {
       const qty = clampBulkQty(product, quantity);
+      const price = offer?.price ?? product.b2bPrice;
+      const k = lineKey(product.id, offer?.distributorId);
       setItems((prev) => {
-        const existing = prev.find((i) => i.productId === product.id);
+        const existing = prev.find((i) => i.key === k);
         if (existing) {
           return prev.map((i) =>
-            i.productId === product.id
-              ? { ...i, quantity: i.quantity + qty, price: product.b2bPrice }
-              : i,
+            i.key === k ? { ...i, quantity: i.quantity + qty, price } : i,
           );
         }
         return [
           ...prev,
           {
+            key: k,
             productId: product.id,
             name: product.name,
             image: product.image,
             unit: product.unit,
             quantity: qty,
-            price: product.b2bPrice,
+            price,
             moq: product.moq,
             ...(product.offer ? { offer: product.offer } : {}),
+            ...(offer
+              ? { distributorId: offer.distributorId, distributorName: offer.distributorName }
+              : {}),
           },
         ];
       });
@@ -86,11 +99,9 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
     return {
       items,
       addBulkToCart,
-      setQuantity: (productId, quantity) =>
-        setItems((prev) =>
-          prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
-        ),
-      removeItem: (productId) => setItems((prev) => prev.filter((i) => i.productId !== productId)),
+      setQuantity: (k, quantity) =>
+        setItems((prev) => prev.map((i) => (i.key === k ? { ...i, quantity } : i))),
+      removeItem: (k) => setItems((prev) => prev.filter((i) => i.key !== k)),
       clearCart: () => setItems([]),
       count: items.reduce((n, i) => n + i.quantity, 0),
       subtotal: items.reduce((n, i) => n + i.price * i.quantity, 0),
@@ -102,9 +113,11 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
           unitPrice: i.price,
           unit: i.unit,
           image: i.image,
+          ...(i.distributorName ? { distributor: i.distributorName } : {}),
         })),
     };
   }, [items]);
+
 
   return <B2BCartContext.Provider value={value}>{children}</B2BCartContext.Provider>;
 }
