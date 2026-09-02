@@ -88,7 +88,7 @@ export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
       0,
       2 + Math.floor(rand(i + 61) * 3),
     ),
-    offers: buildOffers(i, p.bulkPrice, p.mrp, stock),
+    offers,
   };
 });
 
