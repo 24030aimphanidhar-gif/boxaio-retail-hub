@@ -66,12 +66,14 @@ export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
   const moq = Math.max(2, p.bulkMinQty || 10);
   const stockBase = Math.floor(rand(i + 3) * 400);
   const stock = p.inStock ? stockBase : 0;
+  const offers = buildOffers(i, p.bulkPrice, p.mrp, stock);
   return {
     id: p._id,
     name: p.name,
     brand: p.brand,
     category: p.mainCategory,
     subCategory: p.subCategory,
+    distributor: offers[0]!.distributorName,
     image: p.image,
     b2bPrice: p.bulkPrice,
     mrp: p.mrp,
