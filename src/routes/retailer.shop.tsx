@@ -5,9 +5,16 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
-import { B2B_CATEGORIES, B2B_PRODUCTS } from "@/retailer/b2b/service";
+import { B2B_BRANDS, B2B_CATEGORIES, B2B_PRODUCTS, DISTRIBUTORS } from "@/retailer/b2b/service";
+
+type ShopSearch = { category?: string; brand?: string; distributor?: string };
 
 export const Route = createFileRoute("/retailer/shop")({
+  validateSearch: (search: Record<string, unknown>): ShopSearch => ({
+    ...(typeof search["category"] === "string" ? { category: search["category"] } : {}),
+    ...(typeof search["brand"] === "string" ? { brand: search["brand"] } : {}),
+    ...(typeof search["distributor"] === "string" ? { distributor: search["distributor"] } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Wholesale Shop | BOXAIO Business" },
@@ -27,26 +34,40 @@ export const Route = createFileRoute("/retailer/shop")({
 });
 
 function RetailerShop() {
+  const search = Route.useSearch();
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(search.category ?? "all");
+  const [brand, setBrand] = useState(search.brand ?? "all");
+  const [distributor, setDistributor] = useState(search.distributor ?? "all");
   const [sort, setSort] = useState("relevance");
   const [visible, setVisible] = useState(24);
+
+  useEffect(() => {
+    setCategory(search.category ?? "all");
+    setBrand(search.brand ?? "all");
+    setDistributor(search.distributor ?? "all");
+    setVisible(24);
+  }, [search.category, search.brand, search.distributor]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     let rows = B2B_PRODUCTS.filter(
       (p) =>
         (category === "all" || p.category === category) &&
+        (brand === "all" || p.brand === brand) &&
+        (distributor === "all" ||
+          p.offers.some((o) => o.distributorId === distributor)) &&
         (!q ||
           p.name.toLowerCase().includes(q) ||
           p.brand.toLowerCase().includes(q) ||
+          p.sku.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q)),
     );
     if (sort === "price_low") rows = [...rows].sort((a, b) => a.b2bPrice - b.b2bPrice);
     if (sort === "price_high") rows = [...rows].sort((a, b) => b.b2bPrice - a.b2bPrice);
     if (sort === "moq") rows = [...rows].sort((a, b) => a.moq - b.moq);
     return rows;
-  }, [query, category, sort]);
+  }, [query, category, brand, distributor, sort]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">

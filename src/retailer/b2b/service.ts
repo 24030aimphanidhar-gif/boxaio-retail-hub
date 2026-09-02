@@ -66,12 +66,14 @@ export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
   const moq = Math.max(2, p.bulkMinQty || 10);
   const stockBase = Math.floor(rand(i + 3) * 400);
   const stock = p.inStock ? stockBase : 0;
+  const offers = buildOffers(i, p.bulkPrice, p.mrp, stock);
   return {
     id: p._id,
     name: p.name,
     brand: p.brand,
     category: p.mainCategory,
     subCategory: p.subCategory,
+    distributor: offers[0]!.distributorName,
     image: p.image,
     b2bPrice: p.bulkPrice,
     mrp: p.mrp,
@@ -86,7 +88,7 @@ export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
       0,
       2 + Math.floor(rand(i + 61) * 3),
     ),
-    offers: buildOffers(i, p.bulkPrice, p.mrp, stock),
+    offers,
   };
 });
 
@@ -102,6 +104,21 @@ export function productsByDistributor(distributorId: string) {
 }
 
 export const B2B_CATEGORIES = [...new Set(B2B_PRODUCTS.map((p) => p.category))].sort();
+
+export const B2B_BRANDS = [...new Set(B2B_PRODUCTS.map((p) => p.brand))].sort();
+
+/** First product image found for a category (used for browse rails). */
+export function categoryImage(category: string) {
+  return B2B_PRODUCTS.find((p) => p.category === category)?.image ?? "";
+}
+
+export function countByCategory(category: string) {
+  return B2B_PRODUCTS.filter((p) => p.category === category).length;
+}
+
+export function countByBrand(brand: string) {
+  return B2B_PRODUCTS.filter((p) => p.brand === brand).length;
+}
 
 
 /* ------------------------------------------------------------------ orders */

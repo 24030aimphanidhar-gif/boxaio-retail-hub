@@ -26,6 +26,8 @@ export interface B2BProduct {
   brand: string;
   category: string;
   subCategory: string;
+  /** Primary supplying distributor name (first offer). */
+  distributor: string;
   image: string;
   /** Current wholesale price per bulk unit. Always read live — never cached. */
   b2bPrice: number;
