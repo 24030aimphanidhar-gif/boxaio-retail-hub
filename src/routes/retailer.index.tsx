@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
+import { ArrowRight, PackageSearch, Percent, Store, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,10 +8,13 @@ import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCa
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
 import {
   B2B_PRODUCTS,
+  DISTRIBUTORS,
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
+  productsByDistributor,
 } from "@/retailer/b2b/service";
+
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
 
 export const Route = createFileRoute("/retailer/")({
