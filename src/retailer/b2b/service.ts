@@ -105,6 +105,21 @@ export function productsByDistributor(distributorId: string) {
 
 export const B2B_CATEGORIES = [...new Set(B2B_PRODUCTS.map((p) => p.category))].sort();
 
+export const B2B_BRANDS = [...new Set(B2B_PRODUCTS.map((p) => p.brand))].sort();
+
+/** First product image found for a category (used for browse rails). */
+export function categoryImage(category: string) {
+  return B2B_PRODUCTS.find((p) => p.category === category)?.image ?? "";
+}
+
+export function countByCategory(category: string) {
+  return B2B_PRODUCTS.filter((p) => p.category === category).length;
+}
+
+export function countByBrand(brand: string) {
+  return B2B_PRODUCTS.filter((p) => p.brand === brand).length;
+}
+
 
 /* ------------------------------------------------------------------ orders */
 
