@@ -5,9 +5,16 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
-import { B2B_CATEGORIES, B2B_PRODUCTS } from "@/retailer/b2b/service";
+import { B2B_BRANDS, B2B_CATEGORIES, B2B_PRODUCTS, DISTRIBUTORS } from "@/retailer/b2b/service";
+
+type ShopSearch = { category?: string; brand?: string; distributor?: string };
 
 export const Route = createFileRoute("/retailer/shop")({
+  validateSearch: (search: Record<string, unknown>): ShopSearch => ({
+    ...(typeof search["category"] === "string" ? { category: search["category"] } : {}),
+    ...(typeof search["brand"] === "string" ? { brand: search["brand"] } : {}),
+    ...(typeof search["distributor"] === "string" ? { distributor: search["distributor"] } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Wholesale Shop | BOXAIO Business" },
