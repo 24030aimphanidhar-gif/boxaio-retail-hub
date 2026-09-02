@@ -54,8 +54,13 @@ function RetailerCart() {
         <div className="space-y-3 lg:col-span-2">
           {items.map((item) => {
             const product = getB2BProduct(item.productId);
+            // Distributor lines keep their supplier price; plain lines follow live B2B pricing.
+            const livePrice = item.distributorId
+              ? product?.offers.find((o) => o.distributorId === item.distributorId)?.price ??
+                item.price
+              : product?.b2bPrice ?? item.price;
             return (
-              <Card key={item.productId} className="flex gap-4 p-4">
+              <Card key={item.key} className="flex gap-4 p-4">
                 <img
                   src={item.image}
                   alt={item.name}
@@ -66,15 +71,18 @@ function RetailerCart() {
                   <p className="text-xs text-muted-foreground">
                     {item.unit} · MOQ {item.moq} units
                   </p>
-                  <p className="mt-1 text-sm font-semibold">
-                    ₹{product?.b2bPrice ?? item.price} / unit
-                  </p>
+                  {item.distributorName ? (
+                    <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-primary">
+                      Supplied by {item.distributorName}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-sm font-semibold">₹{livePrice} / unit</p>
                   {product ? (
                     <BulkQuantitySelector
                       className="mt-2"
                       product={product}
                       value={item.quantity}
-                      onChange={(q) => setQuantity(item.productId, q)}
+                      onChange={(q) => setQuantity(item.key, q)}
                     />
                   ) : null}
                 </div>
@@ -83,17 +91,18 @@ function RetailerCart() {
                     size="icon"
                     variant="ghost"
                     aria-label={`Remove ${item.name}`}
-                    onClick={() => removeItem(item.productId)}
+                    onClick={() => removeItem(item.key)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
                   <span className="font-bold">
-                    ₹{((product?.b2bPrice ?? item.price) * item.quantity).toLocaleString("en-IN")}
+                    ₹{(livePrice * item.quantity).toLocaleString("en-IN")}
                   </span>
                 </div>
               </Card>
             );
           })}
+
           <Button variant="ghost" onClick={clearCart}>
             Clear cart
           </Button>

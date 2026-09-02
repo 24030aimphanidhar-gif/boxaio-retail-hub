@@ -41,10 +41,14 @@ function RetailerCheckout() {
     setPlacing(true);
     try {
       // Re-price against the live catalogue so no stale price is ever charged.
-      const orderItems = toOrderItems().map((it) => ({
-        ...it,
-        unitPrice: getB2BProduct(it.productId)?.b2bPrice ?? it.unitPrice,
-      }));
+      const orderItems = toOrderItems().map((it) => {
+        const product = getB2BProduct(it.productId);
+        const offerPrice = it.distributor
+          ? product?.offers.find((o) => o.distributorName === it.distributor)?.price
+          : undefined;
+        return { ...it, unitPrice: offerPrice ?? product?.b2bPrice ?? it.unitPrice };
+      });
+
       const order = await placeB2BOrder(user?.email ?? "", orderItems, address);
       clearCart();
       toast.success(`Order ${order.id} placed`);

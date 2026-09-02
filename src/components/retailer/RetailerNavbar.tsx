@@ -23,7 +23,9 @@ const LINKS: { label: string; to: string; exact?: boolean }[] = [
   { label: "Home", to: "/retailer", exact: true },
   { label: "Shop", to: "/retailer/shop" },
   { label: "Business Categories", to: "/retailer/business-categories" },
+  { label: "Shop by Distributor", to: "/retailer/distributors" },
   { label: "Wholesale Deals", to: "/retailer/deals" },
+
   { label: "My Product Catalogue", to: "/retailer/catalogue" },
   { label: "My Orders", to: "/retailer/my-orders" },
 ];
