@@ -79,6 +79,9 @@ export function RetailerProductCard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+            <Store className="size-3" /> {product.distributor}
+          </span>
           <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
             MOQ: {product.moq} units
           </span>
