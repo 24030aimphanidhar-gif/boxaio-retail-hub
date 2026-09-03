@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, ShoppingCart, Tag } from "lucide-react";
+import { Heart, ShoppingCart, Store, Tag } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
