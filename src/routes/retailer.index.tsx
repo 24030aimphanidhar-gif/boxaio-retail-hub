@@ -1,8 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, PackageSearch, Percent, Store, Truck } from "lucide-react";
+import { ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  ShopByBrandRail,
+  ShopByCategoryRail,
+  ShopByDistributorRail,
+} from "@/components/retailer/BrowseRails";
 import { QuickReorder } from "@/components/retailer/QuickReorder";
 import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
