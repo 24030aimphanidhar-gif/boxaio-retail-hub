@@ -99,6 +99,30 @@ function RetailerShop() {
           ))}
         </select>
         <select
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="all">All brands</option>
+          {B2B_BRANDS.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </select>
+        <select
+          value={distributor}
+          onChange={(e) => setDistributor(e.target.value)}
+          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="all">All distributors</option>
+          {DISTRIBUTORS.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+        <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
           className="h-10 rounded-md border border-border bg-background px-3 text-sm"
