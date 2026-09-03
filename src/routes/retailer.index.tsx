@@ -13,11 +13,9 @@ import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCa
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
 import {
   B2B_PRODUCTS,
-  DISTRIBUTORS,
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
-  productsByDistributor,
 } from "@/retailer/b2b/service";
 
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
