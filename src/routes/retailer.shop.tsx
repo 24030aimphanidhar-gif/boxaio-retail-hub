@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,8 +76,8 @@ function RetailerShop() {
         {results.length} products available at business pricing
       </p>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
@@ -95,6 +95,30 @@ function RetailerShop() {
           {B2B_CATEGORIES.map((c) => (
             <option key={c} value={c}>
               {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="all">All brands</option>
+          {B2B_BRANDS.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </select>
+        <select
+          value={distributor}
+          onChange={(e) => setDistributor(e.target.value)}
+          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="all">All distributors</option>
+          {DISTRIBUTORS.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
             </option>
           ))}
         </select>

@@ -1,18 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, PackageSearch, Percent, Store, Truck } from "lucide-react";
+import { ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  ShopByBrandRail,
+  ShopByCategoryRail,
+  ShopByDistributorRail,
+} from "@/components/retailer/BrowseRails";
 import { QuickReorder } from "@/components/retailer/QuickReorder";
 import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
 import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
 import {
   B2B_PRODUCTS,
-  DISTRIBUTORS,
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
-  productsByDistributor,
 } from "@/retailer/b2b/service";
 
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
@@ -70,32 +73,18 @@ function RetailerStorefrontHome() {
         ))}
       </div>
 
-      <section className="mt-12">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Shop by Distributor</h2>
-          <Link
-            to="/retailer/distributors"
-            className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-          >
-            Compare offers <ArrowRight className="size-3.5" />
-          </Link>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {DISTRIBUTORS.map((d) => (
-            <Link key={d.id} to="/retailer/distributors">
-              <Card className="flex items-center gap-3 p-4 transition-shadow hover:shadow-md">
-                <Store className="size-5 text-primary" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{d.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {productsByDistributor(d.id).length} products · offer pricing & margins
-                  </p>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <ShopByCategoryRail />
+      <ShopByBrandRail />
+      <ShopByDistributorRail />
+
+      <div className="mt-3">
+        <Link
+          to="/retailer/distributors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+        >
+          Compare distributor offers side by side <ArrowRight className="size-3.5" />
+        </Link>
+      </div>
 
       {frequent.length > 0 ? (
         <section className="mt-12">
