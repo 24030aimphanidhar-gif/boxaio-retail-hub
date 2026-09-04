@@ -10,6 +10,7 @@ import { useRetailerSession } from "@/retailer/hooks";
 const STOREFRONT_PATHS = [
   "/retailer/shop",
   "/retailer/business-categories",
+  "/retailer/distributors",
   "/retailer/deals",
   "/retailer/catalogue",
   "/retailer/my-orders",

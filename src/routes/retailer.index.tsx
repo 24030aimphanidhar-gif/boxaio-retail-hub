@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
+import { ArrowLeft, ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,12 @@ function RetailerStorefrontHome() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <Link
+        to="/retailer/dashboard"
+        className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+      >
+        <ArrowLeft className="size-4" /> My Store
+      </Link>
       <section className="rounded-2xl bg-primary/10 p-6 sm:p-10">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary">
           BOXAIO Business

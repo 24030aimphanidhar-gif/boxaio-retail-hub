@@ -27,6 +27,9 @@ export function RetailerCatalogueCard({ entry }: { entry: CatalogueEntry }) {
             Last purchased {fmtDate(entry.lastPurchasedAt)} · {entry.lastPurchasedQty} units @ ₹
             {entry.lastPurchasedPrice}
           </p>
+          <p className="mt-1 text-[11px] uppercase tracking-wide">
+            {entry.product.category} · {entry.product.distributor}
+          </p>
           <p className="mt-1 flex items-center gap-1.5">
             <Repeat className="size-3.5" />
             Purchased {entry.purchaseCount}×  · {entry.totalQuantityPurchased} units total

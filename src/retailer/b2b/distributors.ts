@@ -56,7 +56,7 @@ export const DISTRIBUTORS: Distributor[] = [
   d("varsha-enterprises", "VARSHA ENTERPRISES", "Gunadala", 16.5171, 80.6604),
   d("skv-traders", "SKV TRADERS", "Kedareswarapet", 16.5011, 80.6291),
   d("teja-wholesale", "TEJA WHOLESALE", "Singh Nagar", 16.4859, 80.6259, "public"),
-  d("srinivasa-agro", "SRINIVASA AGRO", "Enikepadu", 16.5406, 80.7311, "inactive" as never),
+  d("srinivasa-agro", "SRINIVASA AGRO", "Enikepadu", 16.5406, 80.7311, "public", "inactive"),
 ];
 
 export function getDistributor(id: string): Distributor | null {

@@ -1,16 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PackageSearch, Search, Sparkles, Clock } from "lucide-react";
+import { PackageSearch, MapPin, Search, Sparkles, Clock } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QuickReorder } from "@/components/retailer/QuickReorder";
 import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
+import { DistributorGrid } from "@/components/retailer/DistributorDirectory";
 import {
+  DEFAULT_RETAILER_LOCATION,
+  NEARBY_RADIUS_KM,
+  distributorsWithDistance,
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
+  nearbyDistributors,
+  readRetailerLocation,
   recentlyPurchased,
+  saveRetailerLocation,
 } from "@/retailer/b2b/service";
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
 
@@ -40,6 +47,7 @@ function MyProductCatalogue() {
   const catalogue = useAsync(() => fetchMyCatalogue(email), [email]);
   const orders = useAsync(() => fetchMyOrders(email), [email]);
 
+  const [tab, setTab] = useState<"mine" | "nearby" | "other">("mine");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [availability, setAvailability] = useState("all");
@@ -92,7 +100,33 @@ function MyProductCatalogue() {
         </Link>
       </div>
 
-      {catalogue.loading ? (
+      <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
+        {(
+          [
+            ["mine", "My Products"],
+            ["nearby", "Nearby Distributors"],
+            ["other", "Other Catalogues"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={
+              "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors " +
+              (tab === key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:bg-muted")
+            }
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab !== "mine" ? (
+        <DistributorPanel mode={tab} email={email} />
+      ) : catalogue.loading ? (
         <p className="py-16 text-center text-sm text-muted-foreground">Loading your catalogue…</p>
       ) : entries.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-dashed border-border p-12 text-center">
@@ -209,6 +243,106 @@ function MyProductCatalogue() {
           </section>
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Nearby (within 5 KM of the retailer's saved location) and Other (authorised)
+ * distributor catalogues. Kept strictly separate from "My Products", which is
+ * only what this retailer has actually purchased.
+ */
+function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: string }) {
+  const [location, setLocation] = useState(() => readRetailerLocation(email));
+  const [search, setSearch] = useState("");
+
+  const useLocation = () => {
+    const loc = DEFAULT_RETAILER_LOCATION;
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const next = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          saveRetailerLocation(email, next);
+          setLocation(next);
+        },
+        () => {
+          saveRetailerLocation(email, loc);
+          setLocation(loc);
+        },
+      );
+      return;
+    }
+    saveRetailerLocation(email, loc);
+    setLocation(loc);
+  };
+
+  const q = search.trim().toLowerCase();
+  const all = location ? distributorsWithDistance(location) : [];
+  const near = location ? nearbyDistributors(location, NEARBY_RADIUS_KM) : [];
+  const nearIds = new Set(near.map((d) => d.id));
+  const base = mode === "nearby" ? near : all.filter((d) => !nearIds.has(d.id));
+  const rows = base.filter(
+    (d) =>
+      d.status === "active" &&
+      (!q ||
+        d.name.toLowerCase().includes(q) ||
+        d.businessName.toLowerCase().includes(q) ||
+        d.area.toLowerCase().includes(q)),
+  );
+
+  if (!location) {
+    return (
+      <div className="mt-8 rounded-2xl border border-dashed border-border p-12 text-center">
+        <MapPin className="mx-auto size-8 text-muted-foreground" />
+        <p className="mt-3 font-semibold text-foreground">
+          Set your location to discover nearby distributors
+        </p>
+        <Button className="mt-5" onClick={useLocation}>
+          Set Location
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">
+            {mode === "nearby"
+              ? `Nearby Distributors · Within ${NEARBY_RADIUS_KM} KM`
+              : "Other Catalogues"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {mode === "nearby"
+              ? "Suppliers closest to your store, nearest first."
+              : "Authorised distributors outside your 5 KM radius."}
+          </p>
+        </div>
+        <div className="relative sm:w-72">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search distributor, business or area…"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <DistributorGrid
+          distributors={rows}
+          from={mode}
+          empty={
+            <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+              {mode === "nearby"
+                ? `No distributors within ${NEARBY_RADIUS_KM} KM of your store yet.`
+                : "No other distributor catalogues match your search."}
+            </div>
+          }
+        />
+      </div>
     </div>
   );
 }

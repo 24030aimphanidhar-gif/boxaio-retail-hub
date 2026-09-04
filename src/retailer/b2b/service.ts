@@ -28,16 +28,22 @@ const OFFERS = [
   "Festive wholesale deal",
 ];
 
-/** The distributors BOXAIO buys wholesale stock from. Single source of truth. */
-export const DISTRIBUTORS = [
-  { id: "sai-trade", name: "SAI TRADE" },
-  { id: "sgbl", name: "SGBL" },
-  { id: "ra-agro", name: "RA AGRO" },
-] as const;
+/** Distributor registry lives in one scalable data module. */
+export {
+  DISTRIBUTORS,
+  DEFAULT_RETAILER_LOCATION,
+  NEARBY_RADIUS_KM,
+  canViewCatalogue,
+  distanceKm,
+  distributorsWithDistance,
+  getDistributor,
+  nearbyDistributors,
+  readRetailerLocation,
+  saveRetailerLocation,
+} from "./distributors";
+export type { DistributorWithDistance } from "./distributors";
 
-export function getDistributor(id: string) {
-  return DISTRIBUTORS.find((d) => d.id === id) ?? null;
-}
+import { DISTRIBUTORS } from "./distributors";
 
 const PACK_SIZES = ["500 Ml", "1 Ltr", "2 Ltr", "5 Ltr", "15 Ltr"];
 

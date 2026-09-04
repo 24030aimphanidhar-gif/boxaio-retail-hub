@@ -9,7 +9,7 @@ import { DistributorProductRow } from "@/components/retailer/DistributorProductR
 import { cn } from "@/lib/utils";
 import { DISTRIBUTORS, productsByDistributor } from "@/retailer/b2b/service";
 
-export const Route = createFileRoute("/retailer/distributors")({
+export const Route = createFileRoute("/retailer/distributors/")({
   head: () => ({
     meta: [
       { title: "Shop by Distributor | BOXAIO Business" },
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/retailer/distributors")({
 });
 
 function ShopByDistributor() {
-  const [active, setActive] = useState<string>(DISTRIBUTORS[0].id);
+  const [active, setActive] = useState<string>(DISTRIBUTORS[0]!.id);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(20);
 
