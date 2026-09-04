@@ -6,6 +6,31 @@
  * models the retailer's own store management area.
  */
 
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+export type DistributorStatus = "active" | "inactive";
+export type CatalogueVisibility = "public" | "retailer_only" | "restricted";
+
+/** A wholesale supplier on BOXAIO. Managed centrally as data. */
+export interface Distributor {
+  id: string;
+  name: string;
+  businessName: string;
+  logo: string;
+  area: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  /** Delivery service radius in km. */
+  serviceRadius: number;
+  categories: string[];
+  status: DistributorStatus;
+  catalogueVisibility: CatalogueVisibility;
+}
+
 /** A supplier offer attached to a B2B product. */
 export interface DistributorOffer {
   distributorId: string;
