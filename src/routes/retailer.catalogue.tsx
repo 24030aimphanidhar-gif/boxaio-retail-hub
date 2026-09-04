@@ -92,7 +92,33 @@ function MyProductCatalogue() {
         </Link>
       </div>
 
-      {catalogue.loading ? (
+      <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
+        {(
+          [
+            ["mine", "My Products"],
+            ["nearby", "Nearby Distributors"],
+            ["other", "Other Catalogues"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={
+              "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors " +
+              (tab === key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:bg-muted")
+            }
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab !== "mine" ? (
+        <DistributorPanel mode={tab} email={email} />
+      ) : catalogue.loading ? (
         <p className="py-16 text-center text-sm text-muted-foreground">Loading your catalogue…</p>
       ) : entries.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-dashed border-border p-12 text-center">
