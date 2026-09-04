@@ -6,11 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QuickReorder } from "@/components/retailer/QuickReorder";
 import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
+import { DistributorGrid } from "@/components/retailer/DistributorDirectory";
 import {
+  DEFAULT_RETAILER_LOCATION,
+  NEARBY_RADIUS_KM,
+  distributorsWithDistance,
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
+  nearbyDistributors,
+  readRetailerLocation,
   recentlyPurchased,
+  saveRetailerLocation,
 } from "@/retailer/b2b/service";
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
 
