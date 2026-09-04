@@ -65,6 +65,7 @@ import { Route as RetailerOrdersOrderIdRouteImport } from './routes/retailer.ord
 import { Route as RetailerProductsIndexRouteImport } from './routes/retailer.products.index'
 import { Route as RetailerProductsProductIdRouteImport } from './routes/retailer.products.$productId'
 import { Route as RetailerProductsNewRouteImport } from './routes/retailer.products.new'
+import { Route as RetailerDistributorsDistributorIdCatalogueRouteImport } from './routes/retailer.distributors.$distributorId.catalogue'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -349,6 +350,12 @@ const RetailerProductsNewRoute = RetailerProductsNewRouteImport.update({
   path: '/products/new',
   getParentRoute: () => RetailerRoute,
 } as any)
+const RetailerDistributorsDistributorIdCatalogueRoute =
+  RetailerDistributorsDistributorIdCatalogueRouteImport.update({
+    id: '/distributors/$distributorId/catalogue',
+    path: '/distributors/$distributorId/catalogue',
+    getParentRoute: () => RetailerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -407,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/retailer/distributors/': typeof RetailerDistributorsIndexRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
   '/retailer/products/': typeof RetailerProductsIndexRoute
+  '/retailer/distributors/$distributorId/catalogue': typeof RetailerDistributorsDistributorIdCatalogueRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -464,6 +472,7 @@ export interface FileRoutesByTo {
   '/retailer/distributors': typeof RetailerDistributorsIndexRoute
   '/retailer/orders': typeof RetailerOrdersIndexRoute
   '/retailer/products': typeof RetailerProductsIndexRoute
+  '/retailer/distributors/$distributorId/catalogue': typeof RetailerDistributorsDistributorIdCatalogueRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -523,6 +532,7 @@ export interface FileRoutesById {
   '/retailer/distributors/': typeof RetailerDistributorsIndexRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
   '/retailer/products/': typeof RetailerProductsIndexRoute
+  '/retailer/distributors/$distributorId/catalogue': typeof RetailerDistributorsDistributorIdCatalogueRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -583,6 +593,7 @@ export interface FileRouteTypes {
     | '/retailer/distributors/'
     | '/retailer/orders/'
     | '/retailer/products/'
+    | '/retailer/distributors/$distributorId/catalogue'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -640,6 +651,7 @@ export interface FileRouteTypes {
     | '/retailer/distributors'
     | '/retailer/orders'
     | '/retailer/products'
+    | '/retailer/distributors/$distributorId/catalogue'
   id:
     | '__root__'
     | '/'
@@ -698,6 +710,7 @@ export interface FileRouteTypes {
     | '/retailer/distributors/'
     | '/retailer/orders/'
     | '/retailer/products/'
+    | '/retailer/distributors/$distributorId/catalogue'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1123,6 +1136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerProductsNewRouteImport
       parentRoute: typeof RetailerRoute
     }
+    '/retailer/distributors/$distributorId/catalogue': {
+      id: '/retailer/distributors/$distributorId/catalogue'
+      path: '/distributors/$distributorId/catalogue'
+      fullPath: '/retailer/distributors/$distributorId/catalogue'
+      preLoaderRoute: typeof RetailerDistributorsDistributorIdCatalogueRouteImport
+      parentRoute: typeof RetailerRoute
+    }
   }
 }
 
@@ -1157,6 +1177,7 @@ interface RetailerRouteChildren {
   RetailerDistributorsIndexRoute: typeof RetailerDistributorsIndexRoute
   RetailerOrdersIndexRoute: typeof RetailerOrdersIndexRoute
   RetailerProductsIndexRoute: typeof RetailerProductsIndexRoute
+  RetailerDistributorsDistributorIdCatalogueRoute: typeof RetailerDistributorsDistributorIdCatalogueRoute
 }
 
 const RetailerRouteChildren: RetailerRouteChildren = {
@@ -1190,6 +1211,8 @@ const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerDistributorsIndexRoute: RetailerDistributorsIndexRoute,
   RetailerOrdersIndexRoute: RetailerOrdersIndexRoute,
   RetailerProductsIndexRoute: RetailerProductsIndexRoute,
+  RetailerDistributorsDistributorIdCatalogueRoute:
+    RetailerDistributorsDistributorIdCatalogueRoute,
 }
 
 const RetailerRouteWithChildren = RetailerRoute._addFileChildren(
