@@ -44,7 +44,6 @@ import { Route as RetailerCustomersRouteImport } from './routes/retailer.custome
 import { Route as RetailerDashboardRouteImport } from './routes/retailer.dashboard'
 import { Route as RetailerDealsRouteImport } from './routes/retailer.deals'
 import { Route as RetailerDeliveryRouteImport } from './routes/retailer.delivery'
-import { Route as RetailerDistributorsRouteImport } from './routes/retailer.distributors'
 import { Route as RetailerHoursRouteImport } from './routes/retailer.hours'
 import { Route as RetailerInventoryRouteImport } from './routes/retailer.inventory'
 import { Route as RetailerLocationRouteImport } from './routes/retailer.location'
@@ -60,6 +59,7 @@ import { Route as RetailerShopRouteImport } from './routes/retailer.shop'
 import { Route as RetailerStoreRouteImport } from './routes/retailer.store'
 import { Route as RetailerWishlistRouteImport } from './routes/retailer.wishlist'
 import { Route as OrdersIdTrackingRouteImport } from './routes/orders.$id.tracking'
+import { Route as RetailerDistributorsIndexRouteImport } from './routes/retailer.distributors.index'
 import { Route as RetailerOrdersIndexRouteImport } from './routes/retailer.orders.index'
 import { Route as RetailerOrdersOrderIdRouteImport } from './routes/retailer.orders.$orderId'
 import { Route as RetailerProductsIndexRouteImport } from './routes/retailer.products.index'
@@ -242,11 +242,6 @@ const RetailerDeliveryRoute = RetailerDeliveryRouteImport.update({
   path: '/delivery',
   getParentRoute: () => RetailerRoute,
 } as any)
-const RetailerDistributorsRoute = RetailerDistributorsRouteImport.update({
-  id: '/distributors',
-  path: '/distributors',
-  getParentRoute: () => RetailerRoute,
-} as any)
 const RetailerHoursRoute = RetailerHoursRouteImport.update({
   id: '/hours',
   path: '/hours',
@@ -322,6 +317,12 @@ const OrdersIdTrackingRoute = OrdersIdTrackingRouteImport.update({
   path: '/orders/$id/tracking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetailerDistributorsIndexRoute =
+  RetailerDistributorsIndexRouteImport.update({
+    id: '/distributors/',
+    path: '/distributors/',
+    getParentRoute: () => RetailerRoute,
+  } as any)
 const RetailerOrdersIndexRoute = RetailerOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -382,7 +383,6 @@ export interface FileRoutesByFullPath {
   '/retailer/dashboard': typeof RetailerDashboardRoute
   '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
-  '/retailer/distributors': typeof RetailerDistributorsRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
@@ -404,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
   '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
   '/retailer/products/new': typeof RetailerProductsNewRoute
+  '/retailer/distributors/': typeof RetailerDistributorsIndexRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
   '/retailer/products/': typeof RetailerProductsIndexRoute
 }
@@ -439,7 +440,6 @@ export interface FileRoutesByTo {
   '/retailer/dashboard': typeof RetailerDashboardRoute
   '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
-  '/retailer/distributors': typeof RetailerDistributorsRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
@@ -461,6 +461,7 @@ export interface FileRoutesByTo {
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
   '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
   '/retailer/products/new': typeof RetailerProductsNewRoute
+  '/retailer/distributors': typeof RetailerDistributorsIndexRoute
   '/retailer/orders': typeof RetailerOrdersIndexRoute
   '/retailer/products': typeof RetailerProductsIndexRoute
 }
@@ -498,7 +499,6 @@ export interface FileRoutesById {
   '/retailer/dashboard': typeof RetailerDashboardRoute
   '/retailer/deals': typeof RetailerDealsRoute
   '/retailer/delivery': typeof RetailerDeliveryRoute
-  '/retailer/distributors': typeof RetailerDistributorsRoute
   '/retailer/hours': typeof RetailerHoursRoute
   '/retailer/inventory': typeof RetailerInventoryRoute
   '/retailer/location': typeof RetailerLocationRoute
@@ -520,6 +520,7 @@ export interface FileRoutesById {
   '/retailer/orders/$orderId': typeof RetailerOrdersOrderIdRoute
   '/retailer/products/$productId': typeof RetailerProductsProductIdRoute
   '/retailer/products/new': typeof RetailerProductsNewRoute
+  '/retailer/distributors/': typeof RetailerDistributorsIndexRoute
   '/retailer/orders/': typeof RetailerOrdersIndexRoute
   '/retailer/products/': typeof RetailerProductsIndexRoute
 }
@@ -558,7 +559,6 @@ export interface FileRouteTypes {
     | '/retailer/dashboard'
     | '/retailer/deals'
     | '/retailer/delivery'
-    | '/retailer/distributors'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
@@ -580,6 +580,7 @@ export interface FileRouteTypes {
     | '/retailer/orders/$orderId'
     | '/retailer/products/$productId'
     | '/retailer/products/new'
+    | '/retailer/distributors/'
     | '/retailer/orders/'
     | '/retailer/products/'
   fileRoutesByTo: FileRoutesByTo
@@ -615,7 +616,6 @@ export interface FileRouteTypes {
     | '/retailer/dashboard'
     | '/retailer/deals'
     | '/retailer/delivery'
-    | '/retailer/distributors'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
@@ -637,6 +637,7 @@ export interface FileRouteTypes {
     | '/retailer/orders/$orderId'
     | '/retailer/products/$productId'
     | '/retailer/products/new'
+    | '/retailer/distributors'
     | '/retailer/orders'
     | '/retailer/products'
   id:
@@ -673,7 +674,6 @@ export interface FileRouteTypes {
     | '/retailer/dashboard'
     | '/retailer/deals'
     | '/retailer/delivery'
-    | '/retailer/distributors'
     | '/retailer/hours'
     | '/retailer/inventory'
     | '/retailer/location'
@@ -695,6 +695,7 @@ export interface FileRouteTypes {
     | '/retailer/orders/$orderId'
     | '/retailer/products/$productId'
     | '/retailer/products/new'
+    | '/retailer/distributors/'
     | '/retailer/orders/'
     | '/retailer/products/'
   fileRoutesById: FileRoutesById
@@ -975,13 +976,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerDeliveryRouteImport
       parentRoute: typeof RetailerRoute
     }
-    '/retailer/distributors': {
-      id: '/retailer/distributors'
-      path: '/distributors'
-      fullPath: '/retailer/distributors'
-      preLoaderRoute: typeof RetailerDistributorsRouteImport
-      parentRoute: typeof RetailerRoute
-    }
     '/retailer/hours': {
       id: '/retailer/hours'
       path: '/hours'
@@ -1087,6 +1081,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersIdTrackingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retailer/distributors/': {
+      id: '/retailer/distributors/'
+      path: '/distributors'
+      fullPath: '/retailer/distributors/'
+      preLoaderRoute: typeof RetailerDistributorsIndexRouteImport
+      parentRoute: typeof RetailerRoute
+    }
     '/retailer/orders/': {
       id: '/retailer/orders/'
       path: '/orders'
@@ -1135,7 +1136,6 @@ interface RetailerRouteChildren {
   RetailerDashboardRoute: typeof RetailerDashboardRoute
   RetailerDealsRoute: typeof RetailerDealsRoute
   RetailerDeliveryRoute: typeof RetailerDeliveryRoute
-  RetailerDistributorsRoute: typeof RetailerDistributorsRoute
   RetailerHoursRoute: typeof RetailerHoursRoute
   RetailerInventoryRoute: typeof RetailerInventoryRoute
   RetailerLocationRoute: typeof RetailerLocationRoute
@@ -1154,6 +1154,7 @@ interface RetailerRouteChildren {
   RetailerOrdersOrderIdRoute: typeof RetailerOrdersOrderIdRoute
   RetailerProductsProductIdRoute: typeof RetailerProductsProductIdRoute
   RetailerProductsNewRoute: typeof RetailerProductsNewRoute
+  RetailerDistributorsIndexRoute: typeof RetailerDistributorsIndexRoute
   RetailerOrdersIndexRoute: typeof RetailerOrdersIndexRoute
   RetailerProductsIndexRoute: typeof RetailerProductsIndexRoute
 }
@@ -1168,7 +1169,6 @@ const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerDashboardRoute: RetailerDashboardRoute,
   RetailerDealsRoute: RetailerDealsRoute,
   RetailerDeliveryRoute: RetailerDeliveryRoute,
-  RetailerDistributorsRoute: RetailerDistributorsRoute,
   RetailerHoursRoute: RetailerHoursRoute,
   RetailerInventoryRoute: RetailerInventoryRoute,
   RetailerLocationRoute: RetailerLocationRoute,
@@ -1187,6 +1187,7 @@ const RetailerRouteChildren: RetailerRouteChildren = {
   RetailerOrdersOrderIdRoute: RetailerOrdersOrderIdRoute,
   RetailerProductsProductIdRoute: RetailerProductsProductIdRoute,
   RetailerProductsNewRoute: RetailerProductsNewRoute,
+  RetailerDistributorsIndexRoute: RetailerDistributorsIndexRoute,
   RetailerOrdersIndexRoute: RetailerOrdersIndexRoute,
   RetailerProductsIndexRoute: RetailerProductsIndexRoute,
 }
