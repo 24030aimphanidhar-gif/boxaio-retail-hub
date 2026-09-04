@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
+import { ArrowLeft, ArrowRight, PackageSearch, Percent, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
