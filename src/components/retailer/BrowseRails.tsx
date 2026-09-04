@@ -107,8 +107,9 @@ export function ShopByDistributorRail() {
       {DISTRIBUTORS.map((d) => (
         <Link
           key={d.id}
-          to="/retailer/shop"
-          search={{ distributor: d.id }}
+          to="/retailer/distributors/$distributorId/catalogue"
+          params={{ distributorId: d.id }}
+          search={{ from: "browse" as const }}
           className="flex w-40 shrink-0 items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
         >
           <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
