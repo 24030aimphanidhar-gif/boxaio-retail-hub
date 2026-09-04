@@ -40,6 +40,7 @@ function MyProductCatalogue() {
   const catalogue = useAsync(() => fetchMyCatalogue(email), [email]);
   const orders = useAsync(() => fetchMyOrders(email), [email]);
 
+  const [tab, setTab] = useState<"mine" | "nearby" | "other">("mine");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [availability, setAvailability] = useState("all");
