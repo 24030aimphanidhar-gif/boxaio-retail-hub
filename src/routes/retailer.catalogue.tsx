@@ -256,6 +256,14 @@ function MyProductCatalogue() {
 function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: string }) {
   const [location, setLocation] = useState(() => readRetailerLocation(email));
   const [search, setSearch] = useState("");
+  const areas = useMemo(() => locationOptions(), []);
+
+  const chooseArea = (area: string) => {
+    const opt = areas.find((a) => a.area === area);
+    if (!opt) return;
+    saveRetailerLocation(email, opt.location);
+    setLocation(opt.location);
+  };
 
   const useLocation = () => {
     const loc = DEFAULT_RETAILER_LOCATION;
