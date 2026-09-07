@@ -14,6 +14,7 @@ import {
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
+  locationOptions,
   nearbyDistributors,
   readRetailerLocation,
   recentlyPurchased,
