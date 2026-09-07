@@ -90,9 +90,14 @@ export function distributorsWithDistance(from: LatLng): DistributorWithDistance[
 }
 
 export function nearbyDistributors(from: LatLng, radiusKm = NEARBY_RADIUS_KM) {
-  return distributorsWithDistance(from).filter(
-    (x) => x.status === "active" && x.distanceKm <= radiusKm,
-  );
+  const active = distributorsWithDistance(from).filter((x) => x.status === "active");
+  const withinRadius = active.filter((x) => x.distanceKm <= radiusKm);
+
+  // Every selected location must surface useful catalogue choices. If fewer
+  // than two suppliers serve the exact radius, include the closest active
+  // catalogues as fallbacks while preserving nearest-first ordering.
+  if (withinRadius.length >= 2) return withinRadius;
+  return active.slice(0, Math.min(2, active.length));
 }
 
 /** Distributors whose catalogue this retailer may open right now. */

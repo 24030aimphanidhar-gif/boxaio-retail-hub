@@ -16,11 +16,19 @@ function fmtDate(value: string) {
  * purchase history for that product. Pricing always comes from the live
  * product, never from the old purchase price.
  */
-export function RetailerCatalogueCard({ entry }: { entry: CatalogueEntry }) {
+export function RetailerCatalogueCard({
+  entry,
+  variant = "standard",
+}: {
+  entry: CatalogueEntry;
+  variant?: "standard" | "horizontal";
+}) {
   return (
     <RetailerProductCard
       product={entry.product}
+      variant={variant}
       footer={
+        variant === "horizontal" ? undefined :
         <div className="rounded-lg bg-muted/60 p-2.5 text-xs text-muted-foreground">
           <p className="flex items-center gap-1.5">
             <History className="size-3.5" />
