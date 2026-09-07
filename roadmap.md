@@ -1,0 +1,2 @@
+- [ ] Ensure location-based distributor views show at least 2 catalogues
+- [ ] Apply horizontal card presentation only to the 6th B2B catalogue product
