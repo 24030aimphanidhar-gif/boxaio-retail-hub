@@ -37,7 +37,6 @@ export {
   distanceKm,
   distributorsWithDistance,
   getDistributor,
-  locationOptions,
   nearbyDistributors,
   readRetailerLocation,
   saveRetailerLocation,

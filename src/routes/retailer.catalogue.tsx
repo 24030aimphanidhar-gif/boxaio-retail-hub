@@ -14,7 +14,6 @@ import {
   fetchMyCatalogue,
   fetchMyOrders,
   frequentlyPurchased,
-  locationOptions,
   nearbyDistributors,
   readRetailerLocation,
   recentlyPurchased,
@@ -256,14 +255,6 @@ function MyProductCatalogue() {
 function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: string }) {
   const [location, setLocation] = useState(() => readRetailerLocation(email));
   const [search, setSearch] = useState("");
-  const areas = useMemo(() => locationOptions(), []);
-
-  const chooseArea = (area: string) => {
-    const opt = areas.find((a) => a.area === area);
-    if (!opt) return;
-    saveRetailerLocation(email, opt.location);
-    setLocation(opt.location);
-  };
 
   const useLocation = () => {
     const loc = DEFAULT_RETAILER_LOCATION;
@@ -306,23 +297,9 @@ function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: st
         <p className="mt-3 font-semibold text-foreground">
           Set your location to discover nearby distributors
         </p>
-        <div className="mx-auto mt-5 flex max-w-sm flex-col gap-2 sm:flex-row sm:items-center">
-          <select
-            defaultValue=""
-            onChange={(e) => chooseArea(e.target.value)}
-            className="h-10 flex-1 rounded-md border border-border bg-background px-3 text-sm"
-          >
-            <option value="" disabled>
-              Choose your area…
-            </option>
-            {areas.map((a) => (
-              <option key={a.area} value={a.area}>
-                {a.area}
-              </option>
-            ))}
-          </select>
-          <Button onClick={useLocation}>Use My Location</Button>
-        </div>
+        <Button className="mt-5" onClick={useLocation}>
+          Set Location
+        </Button>
       </div>
     );
   }
@@ -342,30 +319,14 @@ function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: st
               : "Authorised distributors outside your 5 KM radius."}
           </p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <select
-            value={areas.find((a) => a.location.lat === location.lat && a.location.lng === location.lng)?.area ?? ""}
-            onChange={(e) => chooseArea(e.target.value)}
-            className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-          >
-            <option value="" disabled>
-              Change location…
-            </option>
-            {areas.map((a) => (
-              <option key={a.area} value={a.area}>
-                {a.area}
-              </option>
-            ))}
-          </select>
-          <div className="relative sm:w-72">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search distributor, business or area…"
-              className="pl-9"
-            />
-          </div>
+        <div className="relative sm:w-72">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search distributor, business or area…"
+            className="pl-9"
+          />
         </div>
       </div>
 

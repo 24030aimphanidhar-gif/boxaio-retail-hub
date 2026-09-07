@@ -89,29 +89,10 @@ export function distributorsWithDistance(from: LatLng): DistributorWithDistance[
   })).sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
-/**
- * Active distributors near a location, nearest first. Guarantees at least
- * `minCount` results — when fewer than that fall inside the radius, the list
- * is padded with the closest active distributors beyond the radius so a
- * location never shows an empty catalogue.
- */
-export function nearbyDistributors(from: LatLng, radiusKm = NEARBY_RADIUS_KM, minCount = 2) {
-  const active = distributorsWithDistance(from).filter((x) => x.status === "active");
-  const within = active.filter((x) => x.distanceKm <= radiusKm);
-  return within.length >= minCount ? within : active.slice(0, minCount);
-}
-
-/** Selectable store locations — one per distributor area, derived from data. */
-export function locationOptions(): { area: string; location: LatLng }[] {
-  const seen = new Set<string>();
-  const out: { area: string; location: LatLng }[] = [];
-  for (const d of DISTRIBUTORS) {
-    if (d.status !== "active" || seen.has(d.area)) continue;
-    seen.add(d.area);
-    out.push({ area: d.area, location: { lat: d.latitude, lng: d.longitude } });
-  }
-  out.push({ area: "Vijayawada City Centre", location: DEFAULT_RETAILER_LOCATION });
-  return out.sort((a, b) => a.area.localeCompare(b.area));
+export function nearbyDistributors(from: LatLng, radiusKm = NEARBY_RADIUS_KM) {
+  return distributorsWithDistance(from).filter(
+    (x) => x.status === "active" && x.distanceKm <= radiusKm,
+  );
 }
 
 /** Distributors whose catalogue this retailer may open right now. */
