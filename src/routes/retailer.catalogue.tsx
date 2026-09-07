@@ -236,8 +236,12 @@ function MyProductCatalogue() {
             </p>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((e) => (
-                <RetailerCatalogueCard key={e.productId} entry={e} />
+              {filtered.map((e, index) => (
+                <RetailerCatalogueCard
+                  key={e.productId}
+                  entry={e}
+                  variant={index === 5 ? "horizontal" : "standard"}
+                />
               ))}
             </div>
           </section>
