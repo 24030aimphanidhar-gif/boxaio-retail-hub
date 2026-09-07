@@ -306,9 +306,23 @@ function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: st
         <p className="mt-3 font-semibold text-foreground">
           Set your location to discover nearby distributors
         </p>
-        <Button className="mt-5" onClick={useLocation}>
-          Set Location
-        </Button>
+        <div className="mx-auto mt-5 flex max-w-sm flex-col gap-2 sm:flex-row sm:items-center">
+          <select
+            defaultValue=""
+            onChange={(e) => chooseArea(e.target.value)}
+            className="h-10 flex-1 rounded-md border border-border bg-background px-3 text-sm"
+          >
+            <option value="" disabled>
+              Choose your area…
+            </option>
+            {areas.map((a) => (
+              <option key={a.area} value={a.area}>
+                {a.area}
+              </option>
+            ))}
+          </select>
+          <Button onClick={useLocation}>Use My Location</Button>
+        </div>
       </div>
     );
   }
