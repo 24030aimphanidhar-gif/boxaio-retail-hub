@@ -70,7 +70,11 @@ export function RetailerProductCard({
           <button
             type="button"
             aria-label="Save to business wishlist"
-            onClick={() => toggle(product.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggle(product.id);
+            }}
             className="absolute right-2 top-2 rounded-full p-1"
           >
             <Heart
