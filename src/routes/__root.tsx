@@ -7,12 +7,15 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { bootstrapData } from "@/bootstrap";
+import { SyncStatus } from "@/api/SyncStatus";
+import { appPath } from "@/lib/paths";
+import { MobileNavigation } from "@/features/shared/components/MobileNavigation";
 import { Toaster } from "sonner";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Footer } from "@/components/Footer";
-import { MobileAppBanner } from "@/components/MobileAppBanner";
 import { Navbar } from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
@@ -135,12 +138,38 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathname = useRouterState({ select: (s) => appPath(s.location.pathname) });
   const isRetailerArea = pathname.startsWith("/retailer");
+  const [status, setStatus] = useState<"loading" | "ready" | Error>("loading");
+
+  useEffect(() => {
+    bootstrapData().then(() => setStatus("ready"), (e: Error) => setStatus(e));
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+        Loading BOXAIO…
+      </div>
+    );
+  }
+  if (status instanceof Error) {
+    return (
+      <div className="mx-auto max-w-lg px-6 py-24 text-center">
+        <h1 className="text-xl font-bold text-foreground">Connect to Boxaio</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The demo data could not be loaded. {status.message}
+        </p>
+        <button className="mt-4 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground" onClick={() => location.reload()}>
+          Retry connection
+        </button>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -152,15 +181,17 @@ function RootComponent() {
                 {isRetailerArea ? (
                   <Outlet />
                 ) : (
-                  <>
+                  <div className="flex min-h-screen flex-col">
                     <Navbar />
-                    {/* Required: nested routes render here. */}
-                    <Outlet />
+                    <main className="flex-1">
+                      <Outlet />
+                    </main>
                     <Footer />
-                    <MobileAppBanner />
-                  </>
+                    <MobileNavigation />
+                  </div>
                 )}
-                <Toaster position="top-center" />
+                <Toaster position="top-center" richColors />
+                <SyncStatus />
               </SaveListsProvider>
             </WishlistProvider>
           </CartProvider>
