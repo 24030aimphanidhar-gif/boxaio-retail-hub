@@ -123,7 +123,7 @@ export function RetailerProductCard({
 
           {footer}
         </div>
-      </div>
+      </Link>
 
       {/* Bottom: full-width bulk quantity + add to cart */}
       <div className="mt-auto space-y-2 border-t border-border p-3">
