@@ -1,0 +1,19 @@
+[
+  {
+    "email": "retailer@boxaio.com",
+    "role": "retailer",
+    "name": "Vijayawada Fresh Mart",
+    "storeId": "store-vja-01"
+  },
+  {
+    "email": "retailer2@boxaio.com",
+    "role": "retailer",
+    "name": "Hyderabad Daily Needs",
+    "storeId": "store-hyd-01"
+  },
+  {
+    "email": "admin@boxaio.com",
+    "role": "admin",
+    "name": "BOXAIO Admin"
+  }
+]

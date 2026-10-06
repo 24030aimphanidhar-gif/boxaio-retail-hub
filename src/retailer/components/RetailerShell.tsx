@@ -1,3 +1,4 @@
+import {appPath} from '@/lib/paths';
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   BarChart3,
@@ -46,7 +47,7 @@ const SECTIONS: NavSection[] = [
   {
     title: "Overview",
     items: [
-      { label: "Back to B2B storefront", to: "/retailer", icon: Home, exact: true },
+      { label: "Wholesale marketplace", to: "/retailer", icon: Home, exact: true },
       { label: "Dashboard", to: "/retailer/dashboard", icon: BarChart3 },
     ],
   },
@@ -99,7 +100,8 @@ function isActive(pathname: string, item: NavItem) {
 export function RetailerShell({ children }: { children: ReactNode }) {
   const { store, storeId } = useRetailerSession();
   const { user, logout } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname=appPath(rawPathname);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -139,7 +141,7 @@ export function RetailerShell({ children }: { children: ReactNode }) {
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <Icon className="size-4 shrink-0" />
@@ -159,7 +161,7 @@ export function RetailerShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="retailer-workspace min-h-screen bg-muted/30">
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
         <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
@@ -168,6 +170,7 @@ export function RetailerShell({ children }: { children: ReactNode }) {
             size="icon"
             className="lg:hidden"
             aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
           >
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -181,7 +184,7 @@ export function RetailerShell({ children }: { children: ReactNode }) {
               <span className="block text-sm font-bold leading-tight text-foreground">
                 {store?.name ?? "BOXAIO Retailer"}
               </span>
-              <span className="block text-xs text-muted-foreground">Retailer Dashboard</span>
+              <span className="block text-xs text-muted-foreground">Retailer workspace · demo</span>
             </span>
           </Link>
 
@@ -221,14 +224,14 @@ export function RetailerShell({ children }: { children: ReactNode }) {
         <aside
           className={cn(
             "sticky top-16 hidden h-[calc(100vh-4rem)] shrink-0 border-r border-border bg-background transition-all lg:block",
-            collapsed ? "w-[76px]" : "w-64",
+            collapsed ? "w-[76px]" : "w-64"
           )}
         >
           {sidebar}
           <button
             onClick={() => setCollapsed((v) => !v)}
             className="absolute bottom-4 right-3 flex size-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:text-foreground"
-            aria-label="Collapse sidebar"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <ChevronLeft className={cn("size-4 transition-transform", collapsed && "rotate-180")} />
           </button>
@@ -245,7 +248,12 @@ export function RetailerShell({ children }: { children: ReactNode }) {
             <aside className="absolute left-0 top-0 h-full w-72 border-r border-border bg-background shadow-xl">
               <div className="flex h-16 items-center justify-between border-b border-border px-4">
                 <span className="font-semibold">Menu</span>
-                <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close menu"
+                >
                   <X className="size-5" />
                 </Button>
               </div>

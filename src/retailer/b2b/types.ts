@@ -1,3 +1,4 @@
+import type { CheckoutRecord, PaymentMethod } from "@/features/checkout/types";
 /**
  * B2B storefront domain types.
  *
@@ -73,7 +74,6 @@ export interface B2BProduct {
   offers: DistributorOffer[];
 }
 
-
 export interface B2BOrderItem {
   productId: string;
   name: string;
@@ -84,12 +84,17 @@ export interface B2BOrderItem {
   image: string;
   /** Distributor that supplied this line, when chosen from a distributor offer. */
   distributor?: string;
+  distributorId?: string;
+  variantId?: string;
+  baseUnits?: number;
+  freeDelivery?: boolean;
+  discountPct?: number;
 }
-
 
 export type B2BOrderStatus = "placed" | "packed" | "shipped" | "delivered" | "cancelled";
 
 export interface B2BOrder {
+  checkout?: CheckoutRecord;
   id: string;
   retailerEmail: string;
   placedAt: string;
@@ -99,7 +104,7 @@ export interface B2BOrder {
   deliveryFee: number;
   total: number;
   status: B2BOrderStatus;
-  paymentMethod: "Credit (30 days)" | "UPI" | "Bank Transfer";
+  paymentMethod: PaymentMethod | "Credit (30 days)" | "Bank Transfer";
   deliveryAddress: string;
 }
 
@@ -114,6 +119,9 @@ export interface CatalogueEntry {
   lastPurchasedAt: string;
   lastPurchasedQty: number;
   lastPurchasedPrice: number;
+  lastUnit?: string;
+  lastVariantId?: string;
+  lastDistributorId?: string;
   purchaseCount: number;
   totalQuantityPurchased: number;
 }

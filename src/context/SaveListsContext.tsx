@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Product } from '../data/products';
+import {appStorage} from '@/api/storage';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Product } from "../data/products";
 
 export interface SaveListItem {
   id: string;
@@ -39,15 +40,15 @@ interface SaveListsContextType {
 
 const SaveListsContext = createContext<SaveListsContextType | undefined>(undefined);
 
-const DEFAULT_LIST_ID = 'default_save_list';
+const DEFAULT_LIST_ID = "default_save_list";
 
 export function SaveListsProvider({ children }: { children: React.ReactNode }) {
   const emptyDefault = (): Record<string, SaveList> => ({
     [DEFAULT_LIST_ID]: {
       id: DEFAULT_LIST_ID,
-      name: 'My Saved Items',
-      description: 'Default list for all saved items',
-      icon: '\u{1F4E6}',
+      name: "My Saved Items",
+      description: "Default list for all saved items",
+      icon: "\u{1F4E6}",
       items: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -60,7 +61,7 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('save_lists');
+      const saved = appStorage.getItem("save_lists");
       if (saved) {
         const parsed = JSON.parse(saved);
         Object.values(parsed).forEach((list: any) => {
@@ -72,7 +73,7 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
         });
         setLists(parsed);
       }
-      const current = localStorage.getItem('current_save_list_id');
+      const current = appStorage.getItem("current_save_list_id");
       if (current) setCurrentListId(current);
     } catch {
       /* ignore */
@@ -82,13 +83,13 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem('save_lists', JSON.stringify(lists));
+    appStorage.setItem("save_lists", JSON.stringify(lists));
   }, [lists, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
     if (currentListId) {
-      localStorage.setItem('current_save_list_id', currentListId);
+      appStorage.setItem("current_save_list_id", currentListId);
     }
   }, [currentListId, hydrated]);
 
@@ -99,18 +100,18 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
       id: generateId(),
       name,
       description,
-      icon: icon || '📋',
+      icon: icon || "📋",
       items: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    setLists(prev => ({ ...prev, [newList.id]: newList }));
+    setLists((prev) => ({ ...prev, [newList.id]: newList }));
     setCurrentListId(newList.id);
   };
 
   const deleteList = (listId: string) => {
     if (listId === DEFAULT_LIST_ID) return;
-    
+
     const listToDelete = lists[listId];
     if (!listToDelete) return;
 
@@ -134,24 +135,24 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const renameList = (listId: string, newName: string) => {
-    setLists(prev => ({
+    setLists((prev) => ({
       ...prev,
       [listId]: {
         ...prev[listId],
         name: newName,
         updatedAt: new Date(),
-      }
+      },
     }));
   };
 
   const updateListDescription = (listId: string, description: string) => {
-    setLists(prev => ({
+    setLists((prev) => ({
       ...prev,
       [listId]: {
         ...prev[listId],
         description,
         updatedAt: new Date(),
-      }
+      },
     }));
   };
 
@@ -162,50 +163,29 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addToSaveList = (product: Product, listName?: string) => {
-    let targetListId = currentListId || DEFAULT_LIST_ID;
-    
-    // If listName is provided, find or create list with that name
-    if (listName) {
-      const existingList = Object.values(lists).find(l => l.name === listName);
-      if (existingList) {
-        targetListId = existingList.id;
-      } else {
-        createList(listName);
-        // After creating, get the new list ID
-        const newList = Object.values(lists).find(l => l.name === listName);
-        if (newList) {
-          targetListId = newList.id;
-        }
-      }
-    }
-
-    const targetList = lists[targetListId];
-    if (!targetList) return;
-
-    const existingItem = targetList.items.find(item => item.product._id === product._id);
-    
-    let updatedItems;
-    if (existingItem) {
-      // If already exists, do nothing (or could remove - but we'll keep for now)
-      return;
-    } else {
-      // Add new item
-      const newItem: SaveListItem = {
-        id: generateId(),
-        product,
-        addedAt: new Date(),
-      };
-      updatedItems = [...targetList.items, newItem];
-    }
-
-    setLists(prev => ({
-      ...prev,
-      [targetListId]: {
-        ...targetList,
-        items: updatedItems || targetList.items,
+    setLists((prev) => {
+      const existing = listName
+        ? Object.values(prev).find((l) => l.name === listName)
+        : prev[DEFAULT_LIST_ID];
+      const id = existing?.id ?? generateId();
+      const target: SaveList = existing ?? {
+        id,
+        name: listName || "My Saved Items",
+        items: [],
+        icon: "📋",
+        createdAt: new Date(),
         updatedAt: new Date(),
-      }
-    }));
+      };
+      if (target.items.some((i) => i.product._id === product._id)) return prev;
+      return {
+        ...prev,
+        [id]: {
+          ...target,
+          updatedAt: new Date(),
+          items: [...target.items, { id: generateId(), product, addedAt: new Date() }],
+        },
+      };
+    });
   };
 
   const removeFromSaveList = (productId: string, listId?: string) => {
@@ -214,21 +194,21 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
       const targetList = lists[listId];
       if (!targetList) return;
 
-      setLists(prev => ({
+      setLists((prev) => ({
         ...prev,
         [listId]: {
           ...targetList,
-          items: targetList.items.filter(item => item.product._id !== productId),
+          items: targetList.items.filter((item) => item.product._id !== productId),
           updatedAt: new Date(),
-        }
+        },
       }));
     } else {
       // Remove from all lists
       const updatedLists = { ...lists };
-      Object.keys(updatedLists).forEach(id => {
+      Object.keys(updatedLists).forEach((id) => {
         updatedLists[id] = {
           ...updatedLists[id],
-          items: updatedLists[id].items.filter(item => item.product._id !== productId),
+          items: updatedLists[id].items.filter((item) => item.product._id !== productId),
           updatedAt: new Date(),
         };
       });
@@ -239,28 +219,30 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
   const moveToList = (productId: string, fromListId: string, toListId: string) => {
     const fromList = lists[fromListId];
     const toList = lists[toListId];
-    
+
     if (!fromList || !toList) return;
 
-    const productItem = fromList.items.find(item => item.product._id === productId);
+    const productItem = fromList.items.find((item) => item.product._id === productId);
     if (!productItem) return;
 
     // Remove from source list
     const updatedFromList = {
       ...fromList,
-      items: fromList.items.filter(item => item.product._id !== productId),
+      items: fromList.items.filter((item) => item.product._id !== productId),
       updatedAt: new Date(),
     };
 
     // Add to target list (check for duplicates)
-    const alreadyInTarget = toList.items.some(item => item.product._id === productId);
+    const alreadyInTarget = toList.items.some((item) => item.product._id === productId);
     const updatedToList = {
       ...toList,
-      items: alreadyInTarget ? toList.items : [...toList.items, { ...productItem, addedAt: new Date() }],
+      items: alreadyInTarget
+        ? toList.items
+        : [...toList.items, { ...productItem, addedAt: new Date() }],
       updatedAt: new Date(),
     };
 
-    setLists(prev => ({
+    setLists((prev) => ({
       ...prev,
       [fromListId]: updatedFromList,
       [toListId]: updatedToList,
@@ -268,19 +250,19 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isInSaveList = (productId: string) => {
-    return Object.values(lists).some(list => 
-      list.items.some(item => item.product._id === productId)
+    return Object.values(lists).some((list) =>
+      list.items.some((item) => item.product._id === productId)
     );
   };
 
   const getListsContainingProduct = (productId: string) => {
-    return Object.values(lists).filter(list =>
-      list.items.some(item => item.product._id === productId)
+    return Object.values(lists).filter((list) =>
+      list.items.some((item) => item.product._id === productId)
     );
   };
 
   const getListNames = () => {
-    return Object.values(lists).map(list => list.name);
+    return Object.values(lists).map((list) => list.name);
   };
 
   const getCurrentList = () => {
@@ -295,39 +277,41 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
     const targetList = lists[listId];
     if (!targetList) return;
 
-    const updatedItems = targetList.items.map(item =>
+    const updatedItems = targetList.items.map((item) =>
       item.product._id === productId ? { ...item, notes: note } : item
     );
 
-    setLists(prev => ({
+    setLists((prev) => ({
       ...prev,
       [listId]: {
         ...targetList,
         items: updatedItems,
         updatedAt: new Date(),
-      }
+      },
     }));
   };
 
   return (
-    <SaveListsContext.Provider value={{
-      lists,
-      currentListId,
-      createList,
-      deleteList,
-      renameList,
-      updateListDescription,
-      setCurrentList,
-      addToSaveList,
-      removeFromSaveList,
-      moveToList,
-      isInSaveList,
-      getListsContainingProduct,
-      getListNames,
-      getCurrentList,
-      getListById,
-      addNoteToListItem,
-    }}>
+    <SaveListsContext.Provider
+      value={{
+        lists,
+        currentListId,
+        createList,
+        deleteList,
+        renameList,
+        updateListDescription,
+        setCurrentList,
+        addToSaveList,
+        removeFromSaveList,
+        moveToList,
+        isInSaveList,
+        getListsContainingProduct,
+        getListNames,
+        getCurrentList,
+        getListById,
+        addNoteToListItem,
+      }}
+    >
       {children}
     </SaveListsContext.Provider>
   );
@@ -336,7 +320,7 @@ export function SaveListsProvider({ children }: { children: React.ReactNode }) {
 export function useSaveLists() {
   const context = useContext(SaveListsContext);
   if (context === undefined) {
-    throw new Error('useSaveLists must be used within a SaveListsProvider');
+    throw new Error("useSaveLists must be used within a SaveListsProvider");
   }
   return context;
 }

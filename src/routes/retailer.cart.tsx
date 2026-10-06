@@ -1,138 +1,132 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShoppingCart, Trash2 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { BulkQuantitySelector } from "@/components/retailer/BulkQuantitySelector";
-import { getB2BProduct } from "@/retailer/b2b/service";
+import { Package, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { useB2BCart } from "@/retailer/b2b/CartContext";
-
-export const Route = createFileRoute("/retailer/cart")({
-  head: () => ({
-    meta: [
-      { title: "Bulk Cart | BOXAIO Business" },
-      { name: "description", content: "Review your wholesale bulk order before B2B checkout." },
-      { property: "og:title", content: "Bulk Cart | BOXAIO Business" },
-      { property: "og:description", content: "Your BOXAIO wholesale bulk cart." },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: RetailerCart,
-});
-
-function RetailerCart() {
-  const { items, setQuantity, removeItem, subtotal, clearCart } = useB2BCart();
-  const discount = subtotal > 20000 ? Math.round(subtotal * 0.05) : 0;
-  const delivery = subtotal > 5000 || subtotal === 0 ? 0 : 199;
-
-  if (items.length === 0) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <ShoppingCart className="mx-auto size-10 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-bold text-foreground">Your bulk cart is empty</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Add products from the wholesale shop or reorder from My Product Catalogue.
-        </p>
-        <div className="mt-6 flex justify-center gap-2">
-          <Link to="/retailer/shop">
-            <Button>Shop wholesale</Button>
-          </Link>
-          <Link to="/retailer/catalogue">
-            <Button variant="outline">My Product Catalogue</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
+import { orderTotals } from "@/retailer/b2b/pricing";
+import { money } from "@/lib/demo-orders";
+export const Route = createFileRoute("/retailer/cart")({ component: BulkCart });
+function BulkCart() {
+  const { items, setQuantity, removeItem, toOrderItems } = useB2BCart();
+  const totals = orderTotals(toOrderItems());
+  const suppliers = [...new Set(items.map((i) => i.distributorName))];
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Bulk Cart</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{items.length} products in this order</p>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="space-y-3 lg:col-span-2">
-          {items.map((item) => {
-            const product = getB2BProduct(item.productId);
-            // Distributor lines keep their supplier price; plain lines follow live B2B pricing.
-            const livePrice = item.distributorId
-              ? product?.offers.find((o) => o.distributorId === item.distributorId)?.price ??
-                item.price
-              : product?.b2bPrice ?? item.price;
-            return (
-              <Card key={item.key} className="flex gap-4 p-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="size-20 shrink-0 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-foreground">{item.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.unit} · MOQ {item.moq} units
-                  </p>
-                  {item.distributorName ? (
-                    <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-primary">
-                      Supplied by {item.distributorName}
-                    </p>
-                  ) : null}
-                  <p className="mt-1 text-sm font-semibold">₹{livePrice} / unit</p>
-                  {product ? (
-                    <BulkQuantitySelector
-                      className="mt-2"
-                      product={product}
-                      value={item.quantity}
-                      onChange={(q) => setQuantity(item.key, q)}
-                    />
-                  ) : null}
-                </div>
-                <div className="flex flex-col items-end justify-between">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    aria-label={`Remove ${item.name}`}
-                    onClick={() => removeItem(item.key)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                  <span className="font-bold">
-                    ₹{(livePrice * item.quantity).toLocaleString("en-IN")}
-                  </span>
-                </div>
-              </Card>
-            );
-          })}
-
-          <Button variant="ghost" onClick={clearCart}>
-            Clear cart
-          </Button>
+    <div className="wrap business-page">
+      <div className="business-page-heading">
+        <div>
+          <span className="eyebrow">YOUR NEXT RESTOCK</span>
+          <h1>Your bulk basket</h1>
+          <p>
+            {items.length} product variations from {suppliers.length} distributors.
+          </p>
         </div>
-
-        <Card className="h-fit p-5">
-          <h2 className="text-lg font-semibold text-foreground">Order summary</h2>
-          <dl className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Subtotal</dt>
-              <dd>₹{subtotal.toLocaleString("en-IN")}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Bulk discount</dt>
-              <dd className="text-emerald-600">−₹{discount.toLocaleString("en-IN")}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Delivery</dt>
-              <dd>{delivery === 0 ? "Free" : `₹${delivery}`}</dd>
-            </div>
-            <div className="flex justify-between border-t border-border pt-3 text-base font-bold">
-              <dt>Total</dt>
-              <dd>₹{(subtotal - discount + delivery).toLocaleString("en-IN")}</dd>
-            </div>
-          </dl>
-          <Link to="/retailer/checkout" className="mt-5 block">
-            <Button className="w-full">Proceed to B2B checkout</Button>
-          </Link>
-        </Card>
+        <Link to="/retailer/shop" className="outline-button">
+          Keep shopping
+        </Link>
       </div>
+      {!items.length ? (
+        <div className="empty-state">
+          <Package size={35} />
+          <h2>Ready for a fresh restock?</h2>
+          <Link to="/retailer/catalogue" search={{ tab: "mine" }} className="solid-button">
+            Shop my catalogue
+          </Link>
+        </div>
+      ) : (
+        <div className="checkout-layout">
+          <section>
+            {suppliers.map((supplier) => (
+              <div className="supplier-basket-group" key={supplier}>
+                <h2>{supplier}</h2>
+                {items
+                  .filter((i) => i.distributorName === supplier)
+                  .map((i) => (
+                    <article className="bulk-basket-line" key={i.key}>
+                      <img src={i.image} alt="" />
+                      <div>
+                        <h3>{i.name}</h3>
+                        <p>{i.unit}</p>
+                        <small>
+                          {money(i.price)} / pack ·{" "}
+                          {i.discountPct
+                            ? `${i.discountPct}% volume savings`
+                            : "Standard wholesale price"}
+                        </small>
+                        <div className="bulk-line-controls">
+                          <div className="quantity-stepper">
+                            <button
+                              aria-label={"Decrease " + i.name + " " + i.variantId}
+                              disabled={i.quantity <= i.moq}
+                              onClick={() => setQuantity(i.key, i.quantity - i.increment)}
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input
+                              aria-label={"Quantity " + i.name + " " + i.variantId}
+                              type="number"
+                              min={i.moq}
+                              max={i.max}
+                              step={i.increment}
+                              value={i.quantity}
+                              onChange={(e) => setQuantity(i.key, Number(e.target.value))}
+                            />
+                            <button
+                              aria-label={"Increase " + i.name + " " + i.variantId}
+                              disabled={i.quantity + i.increment > i.max}
+                              onClick={() => setQuantity(i.key, i.quantity + i.increment)}
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                          <button
+                            aria-label={"Remove " + i.name + " " + i.variantId}
+                            onClick={() => removeItem(i.key)}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                          <strong>{money(i.price * i.quantity)}</strong>
+                        </div>
+                        {i.error && (
+                          <p role="alert" className="supply-error">
+                            {i.error}
+                          </p>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+              </div>
+            ))}
+          </section>
+          <aside className="order-summary">
+            <h2>Wholesale order summary</h2>
+            <dl>
+              <div>
+                <dt>After volume savings</dt>
+                <dd>{money(totals.subtotal)}</dd>
+              </div>
+              <div>
+                <dt>Order discount</dt>
+                <dd>−{money(totals.discount)}</dd>
+              </div>
+              <div>
+                <dt>Delivery</dt>
+                <dd>{totals.deliveryFee ? money(totals.deliveryFee) : "Free"}</dd>
+              </div>
+              <div className="summary-total">
+                <dt>Total</dt>
+                <dd>{money(totals.total)}</dd>
+              </div>
+            </dl>
+            <p className="summary-assurance">
+              5% extra order discount above ₹20,000. Free delivery above ₹5,000 or when all
+              suppliers include delivery.
+            </p>
+            {items.every((i) => !i.error) && (
+              <Link to="/retailer/checkout" className="solid-button basket-checkout">
+                Review & checkout <ArrowRight size={15} />
+              </Link>
+            )}
+          </aside>
+        </div>
+      )}
     </div>
   );
 }

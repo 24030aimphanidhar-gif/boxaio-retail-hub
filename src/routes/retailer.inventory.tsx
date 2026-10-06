@@ -32,11 +32,26 @@ function Inventory() {
 
   return (
     <div>
-      <PageHeader title="Inventory" description="Track stock levels and restock before you run out." />
+      <PageHeader
+        title="Inventory"
+        description="Track stock levels and restock before you run out."
+      />
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard label="Out of stock" value={rows.filter((p) => stockStatus(p) === "out_of_stock").length} tone="danger" />
-        <StatCard label="Low stock" value={rows.filter((p) => stockStatus(p) === "low_stock").length} tone="warning" />
-        <StatCard label="Healthy stock" value={rows.filter((p) => stockStatus(p) === "in_stock").length} tone="success" />
+        <StatCard
+          label="Out of stock"
+          value={rows.filter((p) => stockStatus(p) === "out_of_stock").length}
+          tone="danger"
+        />
+        <StatCard
+          label="Low stock"
+          value={rows.filter((p) => stockStatus(p) === "low_stock").length}
+          tone="warning"
+        />
+        <StatCard
+          label="Healthy stock"
+          value={rows.filter((p) => stockStatus(p) === "in_stock").length}
+          tone="success"
+        />
       </div>
       {loading ? (
         <LoadingRows rows={8} />
@@ -75,9 +90,13 @@ function Inventory() {
                         min={0}
                         className="w-24"
                         value={drafts[p.id] ?? p.stock}
-                        onChange={(e) => setDrafts((d) => ({ ...d, [p.id]: Number(e.target.value) }))}
+                        onChange={(e) =>
+                          setDrafts((d) => ({ ...d, [p.id]: Number(e.target.value) }))
+                        }
                       />
-                      <Button size="sm" onClick={() => save(p.id, drafts[p.id] ?? p.stock)}>Save</Button>
+                      <Button size="sm" onClick={() => save(p.id, drafts[p.id] ?? p.stock)}>
+                        Save
+                      </Button>
                     </div>
                   </td>
                 </tr>

@@ -6,6 +6,12 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { forwardRef, type AnchorHTMLAttributes, type MouseEvent } from "react";
 
+const base = import.meta.env.BASE_URL.slice(0, -1);
+function baseHref(href: string) {
+  return href.startsWith("/") && !href.startsWith("//") && !href.startsWith(base + "/")
+    ? base + href
+    : href;
+}
 function isModifiedEvent(event: MouseEvent<HTMLAnchorElement>) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
 }
@@ -18,7 +24,7 @@ export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   { href, to, replace, onClick, children, ...rest },
-  ref,
+  ref
 ) {
   const router = useRouter();
   const target = href ?? to ?? "/";
@@ -26,15 +32,19 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   return (
     <a
       ref={ref}
-      href={target}
+      href={baseHref(target)}
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
         if (event.button !== 0 || isModifiedEvent(event) || rest.target === "_blank") return;
-        if (/^(https?:)?\/\//.test(target) || target.startsWith("mailto:") || target.startsWith("tel:"))
+        if (
+          /^(https?:)?\/\//.test(target) ||
+          target.startsWith("mailto:") ||
+          target.startsWith("tel:")
+        )
           return;
         event.preventDefault();
-        void router.navigate({ href: target, replace });
+        void router.navigate({ href: baseHref(target), replace });
       }}
       {...rest}
     >
@@ -50,10 +60,13 @@ export function useLocation(): [string, NavigateFn] {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const navigate: NavigateFn = (href, options) => {
-    void router.navigate({ href, replace: options?.replace });
+    void router.navigate({ href: baseHref(href), replace: options?.replace });
   };
 
-  return [pathname, navigate];
+  return [
+    base && pathname.startsWith(base) ? pathname.slice(base.length) || "/" : pathname,
+    navigate,
+  ];
 }
 
 export function useParams<T extends Record<string, string> = Record<string, string>>(): T {
@@ -71,6 +84,6 @@ export function useSearchParams(): URLSearchParams {
 export function Redirect({ href, to }: { href?: string; to?: string }) {
   const router = useRouter();
   const target = href ?? to ?? "/";
-  void router.navigate({ href: target, replace: true });
+  void router.navigate({ href: baseHref(target), replace: true });
   return null;
 }

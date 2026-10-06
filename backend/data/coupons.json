@@ -1,0 +1,95 @@
+[
+  {
+    "code": "BOXAIO10",
+    "title": "10% off your basket",
+    "min": 500,
+    "percent": 10,
+    "max": 300,
+    "mode": "any",
+    "category": "",
+    "payments": [
+      "UPI",
+      "Card",
+      "Net banking",
+      "Wallet"
+    ],
+    "limit": 3,
+    "first": false,
+    "points": true,
+    "start": "2026-01-01",
+    "end": "2027-12-31"
+  },
+  {
+    "code": "FRESH15",
+    "title": "15% off fresh produce",
+    "min": 300,
+    "percent": 15,
+    "max": 150,
+    "mode": "consumer",
+    "category": "Fruits & Vegetables",
+    "payments": [
+      "UPI",
+      "Card",
+      "Cash on delivery"
+    ],
+    "limit": 2,
+    "first": false,
+    "points": false,
+    "start": "2026-01-01",
+    "end": "2027-12-31"
+  },
+  {
+    "code": "WELCOME",
+    "title": "10% off your first checkout",
+    "min": 200,
+    "percent": 10,
+    "max": 200,
+    "mode": "consumer",
+    "category": "",
+    "payments": [
+      "UPI",
+      "Card"
+    ],
+    "limit": 1,
+    "first": true,
+    "points": true,
+    "start": "2026-01-01",
+    "end": "2027-12-31"
+  },
+  {
+    "code": "BIZ5",
+    "title": "5% off business restocks",
+    "min": 3000,
+    "percent": 5,
+    "max": 1500,
+    "mode": "wholesale",
+    "category": "",
+    "payments": [
+      "UPI",
+      "Bank transfer",
+      "Retailer credit"
+    ],
+    "limit": 5,
+    "first": false,
+    "points": true,
+    "start": "2026-01-01",
+    "end": "2027-12-31"
+  },
+  {
+    "code": "EXPIRED",
+    "title": "Expired sample offer",
+    "min": 0,
+    "percent": 20,
+    "max": 100,
+    "mode": "any",
+    "category": "",
+    "payments": [
+      "UPI"
+    ],
+    "limit": 1,
+    "first": false,
+    "points": false,
+    "start": "2025-01-01",
+    "end": "2025-12-31"
+  }
+]

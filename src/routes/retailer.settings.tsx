@@ -73,7 +73,8 @@ function Settings() {
         <Card className="space-y-3 p-5">
           <h2 className="text-lg font-semibold">Store</h2>
           <p className="text-sm text-muted-foreground">
-            Signed in as retailer for <span className="font-medium text-foreground">{store?.name}</span>.
+            Signed in as retailer for{" "}
+            <span className="font-medium text-foreground">{store?.name}</span>.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button

@@ -1,3 +1,4 @@
+import {appStorage} from '@/api/storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Product } from '../data/products';
 
@@ -20,7 +21,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   // Hydrate after mount so server and client render the same initial markup.
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('wishlist');
+      const saved = appStorage.getItem('wishlist');
       if (saved) setWishlist(JSON.parse(saved));
     } catch {
       /* ignore */
@@ -31,7 +32,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   // Save to localStorage whenever wishlist changes
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    appStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist, hydrated]);
 
   const toggleWishlist = (product: Product) => {

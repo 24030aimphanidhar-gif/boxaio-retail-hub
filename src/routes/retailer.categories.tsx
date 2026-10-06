@@ -24,7 +24,10 @@ function Categories() {
 
   return (
     <div>
-      <PageHeader title="Categories" description="How your catalogue is organised across BOXAIO categories." />
+      <PageHeader
+        title="Categories"
+        description="How your catalogue is organised across BOXAIO categories."
+      />
       {loading ? (
         <LoadingRows rows={6} />
       ) : (

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "BX-1048",
+    "date": "2026-09-19T05:29:14.876Z",
+    "status": "Shipped",
+    "items": [
+      {
+        "productId": "prod_001",
+        "name": "Fresh Tomato",
+        "quantity": 1,
+        "price": 40,
+        "image": "https://images.unsplash.com/photo-1546094096-0df4bcaaa2b8?w=600&auto=format&fit=crop",
+        "unit": "500g",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_002",
+        "name": "Potato (White)",
+        "quantity": 1,
+        "price": 35,
+        "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop",
+        "unit": "1 kg",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_003",
+        "name": "Onion (Red)",
+        "quantity": 1,
+        "price": 45,
+        "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop",
+        "unit": "1 kg",
+        "type": "normal"
+      }
+    ],
+    "subtotal": 120,
+    "discount": 0,
+    "shipping": 0,
+    "total": 120,
+    "address": "24 MG Road, Vijayawada, Andhra Pradesh 520010",
+    "deliveryDate": "2026-09-22",
+    "slot": "9 AM – 12 PM",
+    "payment": "Demo payment"
+  },
+  {
+    "id": "BX-1047",
+    "date": "2026-09-17T05:29:14.876Z",
+    "status": "Delivered",
+    "items": [
+      {
+        "productId": "prod_004",
+        "name": "Cauliflower",
+        "quantity": 1,
+        "price": 45,
+        "image": "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=600&auto=format&fit=crop",
+        "unit": "1 piece",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_005",
+        "name": "Cabbage",
+        "quantity": 1,
+        "price": 30,
+        "image": "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&auto=format&fit=crop",
+        "unit": "1 kg",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_006",
+        "name": "Alphonso Mango",
+        "quantity": 1,
+        "price": 299,
+        "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop",
+        "unit": "1 dozen",
+        "type": "normal"
+      }
+    ],
+    "subtotal": 374,
+    "discount": 0,
+    "shipping": 0,
+    "total": 374,
+    "address": "24 MG Road, Vijayawada, Andhra Pradesh 520010",
+    "deliveryDate": "2026-09-19",
+    "slot": "9 AM – 12 PM",
+    "payment": "Demo payment"
+  },
+  {
+    "id": "BX-1046",
+    "date": "2026-09-15T05:29:14.876Z",
+    "status": "Delivered",
+    "items": [
+      {
+        "productId": "prod_007",
+        "name": "Washington Apple",
+        "quantity": 1,
+        "price": 280,
+        "image": "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=600&auto=format&fit=crop",
+        "unit": "1 kg",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_008",
+        "name": "Fresh Strawberries",
+        "quantity": 1,
+        "price": 249,
+        "image": "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&auto=format&fit=crop",
+        "unit": "250g",
+        "type": "normal"
+      },
+      {
+        "productId": "prod_009",
+        "name": "Green Grapes (Seedless)",
+        "quantity": 1,
+        "price": 120,
+        "image": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600&auto=format&fit=crop",
+        "unit": "500g",
+        "type": "normal"
+      }
+    ],
+    "subtotal": 649,
+    "discount": 0,
+    "shipping": 0,
+    "total": 649,
+    "address": "24 MG Road, Vijayawada, Andhra Pradesh 520010",
+    "deliveryDate": "2026-09-16",
+    "slot": "9 AM – 12 PM",
+    "payment": "Demo payment"
+  }
+]

@@ -1,3 +1,6 @@
+import {appStorage} from '@/api/storage';
+import {mockData} from '@/api/bootstrap-data';
+import { checkoutOrders, wholesaleProjection } from "@/features/checkout/storage";
 /**
  * B2B storefront data service (retailer buying from BOXAIO).
  *
@@ -16,18 +19,6 @@ import type { B2BOrder, B2BOrderItem, B2BProduct, CatalogueEntry } from "./types
 
 const ORDERS_KEY = "boxaio_b2b_orders_v1";
 
-function rand(seed: number) {
-  const x = Math.sin(seed * 13.37) * 10000;
-  return x - Math.floor(x);
-}
-
-const OFFERS = [
-  "Extra 5% off on 100+ units",
-  "Buy 10 get 1 free",
-  "Free delivery above ₹5,000",
-  "Festive wholesale deal",
-];
-
 /** Distributor registry lives in one scalable data module. */
 export {
   DISTRIBUTORS,
@@ -44,67 +35,10 @@ export {
 export type { DistributorWithDistance } from "./distributors";
 
 import { DISTRIBUTORS } from "./distributors";
+import { availableOffers, quoteProduct, orderTotals, validateCombinedStock } from "./pricing";
 
-const PACK_SIZES = ["500 Ml", "1 Ltr", "2 Ltr", "5 Ltr", "15 Ltr"];
-
-function buildOffers(index: number, basePrice: number, mrp: number, stock: number) {
-  // Deterministic: every product gets 1–3 distributor offers with slightly
-  // different pricing so retailers can compare suppliers.
-  const count = 1 + Math.floor(rand(index + 21) * 3);
-  const start = index % DISTRIBUTORS.length;
-  return Array.from({ length: count }, (_, k) => {
-    const d = DISTRIBUTORS[(start + k) % DISTRIBUTORS.length]!;
-    const price = Math.round((basePrice * (1 + (k - 0.5) * 0.012)) * 100) / 100;
-    return {
-      distributorId: d.id,
-      distributorName: d.name,
-      price,
-      marginPct: Math.max(2, Math.round(((mrp - price) / Math.max(mrp, 1)) * 100)),
-      freeDelivery: rand(index + k + 31) > 0.25,
-      stock: Math.max(0, Math.round(stock * (0.6 + rand(index + k + 41) * 0.4))),
-      deliveryEstimate: rand(index + k + 51) > 0.5 ? "Tomorrow" : "In 2 days",
-    };
-  });
-}
-
-/** Live wholesale catalogue. Always computed — never cached with a price. */
-export const B2B_PRODUCTS: B2BProduct[] = catalogue.map((p, i) => {
-  const moq = Math.max(2, p.bulkMinQty || 10);
-  const stockBase = Math.floor(rand(i + 3) * 400);
-  const stock = p.inStock ? stockBase : 0;
-  const offers = buildOffers(i, p.bulkPrice, p.mrp, stock);
-  return {
-    id: p._id,
-    name: p.name,
-    brand: p.brand,
-    category: p.mainCategory,
-    subCategory: p.subCategory,
-    distributor: offers[0]!.distributorName,
-    image: p.image,
-    b2bPrice: p.bulkPrice,
-    mrp: p.mrp,
-    unit: p.bulkUnit,
-    moq,
-    increment: Math.max(1, Math.round(moq / 2)),
-    stock,
-    sku: `BX-${p._id.replace("prod_", "").toUpperCase()}`,
-    ...(rand(i + 11) > 0.72 ? { offer: OFFERS[i % OFFERS.length]! } : {}),
-    description: p.description,
-    packSizes: [p.bulkUnit, ...PACK_SIZES.filter((s) => s !== p.bulkUnit)].slice(
-      0,
-      2 + Math.floor(rand(i + 61) * 3),
-    ),
-    offers,
-  };
-});
-
-const PRODUCT_INDEX = new Map(B2B_PRODUCTS.map((p) => [p.id, p]));
-
-export function getB2BProduct(id: string) {
-  return PRODUCT_INDEX.get(id) ?? null;
-}
-
-/** Products supplied by a given distributor. */
+export {B2B_PRODUCTS,getB2BProduct} from '../../../backend/src/domain/catalogue';
+import {B2B_PRODUCTS,getB2BProduct} from '../../../backend/src/domain/catalogue';
 export function productsByDistributor(distributorId: string) {
   return B2B_PRODUCTS.filter((p) => p.offers.some((o) => o.distributorId === distributorId));
 }
@@ -126,66 +60,30 @@ export function countByBrand(brand: string) {
   return B2B_PRODUCTS.filter((p) => p.brand === brand).length;
 }
 
-
 /* ------------------------------------------------------------------ orders */
 
-function seedOrders(): B2BOrder[] {
-  const retailers = ["retailer@boxaio.com", "retailer2@boxaio.com"];
-  const orders: B2BOrder[] = [];
-  let counter = 10231;
-
-  retailers.forEach((email, rIdx) => {
-    for (let i = 0; i < 7; i++) {
-      const daysAgo = 4 + i * 11;
-      const placedAt = new Date(Date.now() - daysAgo * 86400_000);
-      const itemCount = 3 + Math.floor(rand(i + rIdx * 5) * 4);
-      const items: B2BOrderItem[] = Array.from({ length: itemCount }, (_, k) => {
-        // Deliberately overlapping picks so some products repeat across orders
-        // and become "frequently purchased".
-        const p = B2B_PRODUCTS[(i * 3 + k * (7 + rIdx)) % 24]!;
-        return {
-          productId: p.id,
-          name: p.name,
-          quantity: p.moq * (1 + Math.floor(rand(i + k + rIdx) * 3)),
-          unitPrice: Math.round(p.b2bPrice * (0.92 + rand(i + k) * 0.1)),
-          unit: p.unit,
-          image: p.image,
-        };
-      });
-      const subtotal = items.reduce((s, it) => s + it.unitPrice * it.quantity, 0);
-      const discount = Math.round(subtotal * 0.03);
-      orders.push({
-        id: `BX${counter++}`,
-        retailerEmail: email,
-        placedAt: placedAt.toISOString(),
-        items,
-        subtotal,
-        discount,
-        deliveryFee: 0,
-        total: subtotal - discount,
-        status: "delivered",
-        paymentMethod: "Credit (30 days)",
-        deliveryAddress:
-          rIdx === 0
-            ? "12-4-88, MG Road, Governorpet, Vijayawada 520002"
-            : "Plot 21, Jubilee Hills Road No. 36, Hyderabad 500033",
-      });
-    }
-  });
-  return orders;
-}
+function seedOrders():B2BOrder[]{return structuredClone(mockData.wholesaleOrders) as B2BOrder[];}
 
 function readOrders(): B2BOrder[] {
+  const legacy = legacyReadOrders();
+  return [
+    ...checkoutOrders()
+      .filter((o) => o.mode === "wholesale" && !legacy.some((l) => l.id === o.id))
+      .map(wholesaleProjection),
+    ...legacy,
+  ];
+}
+function legacyReadOrders(): B2BOrder[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(ORDERS_KEY);
+    const raw = appStorage.getItem(ORDERS_KEY);
     if (raw) return JSON.parse(raw) as B2BOrder[];
   } catch {
     /* fall through to seeding */
   }
   const seeded = seedOrders();
   try {
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(seeded));
+    appStorage.setItem(ORDERS_KEY, JSON.stringify(seeded));
   } catch {
     /* storage unavailable — keep in memory for this session */
   }
@@ -194,7 +92,7 @@ function readOrders(): B2BOrder[] {
 
 function writeOrders(rows: B2BOrder[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(rows));
+  appStorage.setItem(ORDERS_KEY, JSON.stringify(rows));
 }
 
 const delay = () => new Promise((r) => setTimeout(r, 120));
@@ -209,21 +107,40 @@ export async function fetchMyOrders(retailerEmail: string): Promise<B2BOrder[]> 
 export async function placeB2BOrder(
   retailerEmail: string,
   items: B2BOrderItem[],
-  deliveryAddress: string,
+  deliveryAddress: string
 ): Promise<B2BOrder> {
   await delay();
+  if (!retailerEmail || !items.length || deliveryAddress.trim().length < 10)
+    throw new Error("Complete the delivery address and add at least one item.");
+  items = items.map((item) => {
+    const p = getB2BProduct(item.productId);
+    if (!p) throw new Error("Product no longer available.");
+    const offer = item.distributorId
+      ? p.offers.find((o) => o.distributorId === item.distributorId)
+      : availableOffers(p)[0];
+    if (!offer) throw new Error("Supplier no longer available.");
+    const q = quoteProduct(p, offer, item.variantId, item.quantity);
+    if (q.error) throw new Error(p.name + ": " + q.error);
+    return {
+      ...item,
+      unit: q.variant.label,
+      unitPrice: q.unitPrice,
+      distributorId: offer.distributorId,
+      distributor: offer.distributorName,
+      variantId: q.variant.id,
+      baseUnits: q.baseUnits,
+      freeDelivery: offer.freeDelivery,
+      discountPct: q.discountPct,
+    };
+  });
+  validateCombinedStock(items, getB2BProduct);
   const all = readOrders();
-  const subtotal = items.reduce((s, it) => s + it.unitPrice * it.quantity, 0);
-  const discount = subtotal > 20000 ? Math.round(subtotal * 0.05) : 0;
   const order: B2BOrder = {
-    id: `BX${10500 + all.length}`,
+    id: "BX-" + crypto.randomUUID().slice(0, 8).toUpperCase(),
     retailerEmail,
     placedAt: new Date().toISOString(),
     items,
-    subtotal,
-    discount,
-    deliveryFee: subtotal > 5000 ? 0 : 199,
-    total: subtotal - discount + (subtotal > 5000 ? 0 : 199),
+    ...orderTotals(items),
     status: "placed",
     paymentMethod: "Credit (30 days)",
     deliveryAddress,
@@ -239,7 +156,7 @@ export async function placeB2BOrder(
 export async function markOrderDelivered(orderId: string): Promise<void> {
   await delay();
   writeOrders(
-    readOrders().map((o) => (o.id === orderId ? { ...o, status: "delivered" as const } : o)),
+    readOrders().map((o) => (o.id === orderId ? { ...o, status: "delivered" as const } : o))
   );
 }
 
@@ -258,6 +175,7 @@ export async function fetchMyCatalogue(retailerEmail: string): Promise<Catalogue
 
   const map = new Map<string, CatalogueEntry>();
   orders.forEach((order) => {
+    const seenProducts = new Set<string>();
     order.items.forEach((item) => {
       const product = getB2BProduct(item.productId);
       if (!product) return; // product retired from BOXAIO
@@ -266,8 +184,12 @@ export async function fetchMyCatalogue(retailerEmail: string): Promise<Catalogue
         existing.lastPurchasedAt = order.placedAt;
         existing.lastPurchasedQty = item.quantity;
         existing.lastPurchasedPrice = item.unitPrice;
-        existing.purchaseCount += 1;
-        existing.totalQuantityPurchased += item.quantity;
+        existing.lastUnit = item.unit;
+        existing.lastVariantId = item.variantId;
+        existing.lastDistributorId = item.distributorId;
+        existing.purchaseCount += seenProducts.has(item.productId) ? 0 : 1;
+        seenProducts.add(item.productId);
+        existing.totalQuantityPurchased += item.baseUnits ?? item.quantity;
         return;
       }
       map.set(item.productId, {
@@ -276,9 +198,13 @@ export async function fetchMyCatalogue(retailerEmail: string): Promise<Catalogue
         lastPurchasedAt: order.placedAt,
         lastPurchasedQty: item.quantity,
         lastPurchasedPrice: item.unitPrice,
+        lastUnit: item.unit,
+        lastVariantId: item.variantId,
+        lastDistributorId: item.distributorId,
         purchaseCount: 1,
-        totalQuantityPurchased: item.quantity,
+        totalQuantityPurchased: item.baseUnits ?? item.quantity,
       });
+      seenProducts.add(item.productId);
     });
   });
 
@@ -289,8 +215,7 @@ export function frequentlyPurchased(entries: CatalogueEntry[]) {
   return [...entries]
     .sort(
       (a, b) =>
-        b.purchaseCount - a.purchaseCount ||
-        b.totalQuantityPurchased - a.totalQuantityPurchased,
+        b.purchaseCount - a.purchaseCount || b.totalQuantityPurchased - a.totalQuantityPurchased
     )
     .slice(0, 8);
 }

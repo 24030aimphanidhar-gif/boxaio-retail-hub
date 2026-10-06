@@ -32,9 +32,7 @@ export function BulkQuantitySelector({
 
   if (variant === "bar") {
     return (
-      <div
-        className={cn("flex items-center gap-2 rounded-xl bg-muted px-2 py-1.5", className)}
-      >
+      <div className={cn("flex items-center gap-2 rounded-xl bg-muted px-2 py-1.5", className)}>
         <Button
           type="button"
           size="icon"

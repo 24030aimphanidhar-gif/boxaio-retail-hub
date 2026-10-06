@@ -23,7 +23,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OrderStatusBadge, PageHeader, StatCard, LoadingRows } from "@/retailer/components/ui-bits";
-import { fetchDashboardSummary, fetchOrders, fetchProducts, fetchSales } from "@/retailer/data/service";
+import {
+  fetchDashboardSummary,
+  fetchOrders,
+  fetchProducts,
+  fetchSales,
+} from "@/retailer/data/service";
 import { formatCurrency, formatDate, useAsync, useRetailerSession } from "@/retailer/hooks";
 import { stockStatus } from "@/retailer/types";
 
@@ -48,7 +53,7 @@ function RetailerDashboard() {
         const entry = totals.get(it.productId) ?? { name: it.name, qty: 0 };
         entry.qty += it.quantity;
         totals.set(it.productId, entry);
-      }),
+      })
     );
     return [...totals.values()].sort((a, b) => b.qty - a.qty).slice(0, 6);
   })();
@@ -135,7 +140,11 @@ function RetailerDashboard() {
                     <stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
                 <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
                 <YAxis tickLine={false} axisLine={false} fontSize={12} width={60} />
                 <Tooltip
@@ -166,7 +175,11 @@ function RetailerDashboard() {
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topProducts} layout="vertical" margin={{ left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  horizontal={false}
+                />
                 <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} />
                 <YAxis
                   type="category"
@@ -194,7 +207,10 @@ function RetailerDashboard() {
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Recent orders</h2>
-            <Link to="/retailer/orders" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            <Link
+              to="/retailer/orders"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
               View all <ArrowRight className="size-3.5" />
             </Link>
           </div>
@@ -228,14 +244,19 @@ function RetailerDashboard() {
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Stock alerts</h2>
-            <Link to="/retailer/inventory" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            <Link
+              to="/retailer/inventory"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
               Manage inventory <ArrowRight className="size-3.5" />
             </Link>
           </div>
           {products.loading ? (
             <LoadingRows />
           ) : lowStock.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Every product is well stocked.</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              Every product is well stocked.
+            </p>
           ) : (
             <div className="divide-y divide-border">
               {lowStock.map((p) => (

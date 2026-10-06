@@ -12,7 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EmptyState, LoadingRows, OrderStatusBadge, PageHeader } from "@/retailer/components/ui-bits";
+import {
+  EmptyState,
+  LoadingRows,
+  OrderStatusBadge,
+  PageHeader,
+} from "@/retailer/components/ui-bits";
 import { fetchOrders, updateOrderStatus } from "@/retailer/data/service";
 import { formatCurrency, formatDate, useAsync, useRetailerSession } from "@/retailer/hooks";
 import {
@@ -70,7 +75,10 @@ function RetailerOrders() {
 
   return (
     <div>
-      <PageHeader title="Orders" description="Accept, prepare and track every order placed with your store." />
+      <PageHeader
+        title="Orders"
+        description="Accept, prepare and track every order placed with your store."
+      />
 
       <Card className="mb-4 flex flex-col gap-3 p-4 sm:flex-row">
         <Input
@@ -112,7 +120,10 @@ function RetailerOrders() {
       {loading ? (
         <LoadingRows rows={6} />
       ) : orders.length === 0 ? (
-        <EmptyState title="No orders here" description="Try a different filter or check back soon." />
+        <EmptyState
+          title="No orders here"
+          description="Try a different filter or check back soon."
+        />
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
@@ -133,7 +144,8 @@ function RetailerOrders() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {order.customerName} · {order.items.length} item(s) · {formatDate(order.placedAt)}
+                    {order.customerName} · {order.items.length} item(s) ·{" "}
+                    {formatDate(order.placedAt)}
                   </p>
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     {order.items.map((i) => `${i.name} ×${i.quantity}`).join(", ")}
@@ -141,7 +153,9 @@ function RetailerOrders() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="mr-2 text-lg font-bold text-foreground">{formatCurrency(order.total)}</span>
+                  <span className="mr-2 text-lg font-bold text-foreground">
+                    {formatCurrency(order.total)}
+                  </span>
                   {ORDER_TRANSITIONS[order.status].map((next) => (
                     <Button
                       key={next}

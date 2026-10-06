@@ -1,129 +1,192 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-
+import {appStorage} from '@/api/storage';
+import type { CheckoutRecord } from "@/features/checkout/types";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
-
-import { clampBulkQty, type B2BOrderItem, type B2BProduct, type DistributorOffer } from "./types";
-
-/**
- * B2B (bulk) cart — completely separate from the B2C `CartContext` so the two
- * shopping experiences never mix. Persisted per retailer account.
- */
+import { toast } from "sonner";
+import type { B2BOrderItem, B2BProduct, DistributorOffer } from "./types";
+import { getB2BProduct } from "./service";
+import { availableOffers, quoteProduct, validateCombinedStock, orderTotals } from "./pricing";
 export interface B2BCartItem {
-  /** Unique line key: product + distributor (same product from two suppliers = two lines). */
   key: string;
   productId: string;
   name: string;
   image: string;
   unit: string;
   quantity: number;
-  /** Snapshot for display; checkout re-reads the live price. */
   price: number;
   moq: number;
+  increment: number;
+  max: number;
   offer?: string;
-  distributorId?: string;
-  distributorName?: string;
+  distributorId: string;
+  distributorName: string;
+  variantId: string;
+  freeDelivery: boolean;
+  discountPct: number;
+  error: string;
 }
-
-interface B2BCartContextType {
+interface CartContext {
   items: B2BCartItem[];
-  addBulkToCart: (product: B2BProduct, quantity: number, offer?: DistributorOffer) => void;
-  setQuantity: (key: string, quantity: number) => void;
+  addBulkToCart: (
+    p: B2BProduct,
+    qty: number,
+    offer?: DistributorOffer,
+    variantId?: string
+  ) => boolean;
+  setQuantity: (key: string, qty: number) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;
+  consumeOrder: (order: CheckoutRecord) => void;
   count: number;
   subtotal: number;
   toOrderItems: () => B2BOrderItem[];
 }
-
-const B2BCartContext = createContext<B2BCartContextType | undefined>(undefined);
-
-const lineKey = (productId: string, distributorId?: string) =>
-  distributorId ? `${productId}::${distributorId}` : productId;
-
+const Context = createContext<CartContext | undefined>(undefined);
+const orderItem = (i: B2BCartItem): B2BOrderItem => ({
+  productId: i.productId,
+  name: i.name,
+  image: i.image,
+  unit: i.unit,
+  unitPrice: i.price,
+  quantity: i.quantity,
+  distributor: i.distributorName,
+  distributorId: i.distributorId,
+  variantId: i.variantId,
+  freeDelivery: i.freeDelivery,
+  discountPct: i.discountPct,
+});
+function materialize(raw: Partial<B2BCartItem>): B2BCartItem | null {
+  const p = getB2BProduct(raw.productId || "");
+  if (!p) return null;
+  const offer = raw.distributorId
+    ? p.offers.find((o) => o.distributorId === raw.distributorId)
+    : availableOffers(p)[0];
+  if (!offer) return null;
+  const variantId = raw.variantId || "standard";
+  const q = quoteProduct(p, offer, variantId, raw.quantity);
+  return {
+    key: `${p.id}::${offer.distributorId}::${variantId}`,
+    productId: p.id,
+    name: p.name,
+    image: p.image,
+    unit: q.variant.label,
+    quantity: q.quantity,
+    price: q.unitPrice,
+    moq: q.variant.moq,
+    increment: q.variant.increment,
+    max: q.max,
+    distributorId: offer.distributorId,
+    distributorName: offer.distributorName,
+    variantId,
+    freeDelivery: offer.freeDelivery,
+    discountPct: q.discountPct,
+    error: q.error,
+  };
+}
 export function B2BCartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const key = `boxaio_b2b_cart_${user?.email ?? "guest"}`;
+  const key = "boxaio_b2b_cart_" + (user?.email || "guest");
   const [items, setItems] = useState<B2BCartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
-
+  const current = useRef<B2BCartItem[]>([]);
+  const [loaded, setLoaded] = useState("");
   useEffect(() => {
-    setHydrated(false);
+    let rows: B2BCartItem[] = [];
     try {
-      const raw = localStorage.getItem(key);
-      const parsed = raw ? (JSON.parse(raw) as B2BCartItem[]) : [];
-      // Backwards compatible with carts saved before distributor support.
-      setItems(parsed.map((i) => ({ ...i, key: i.key ?? i.productId })));
-    } catch {
-      setItems([]);
-    }
-    setHydrated(true);
+      rows = (JSON.parse(appStorage.getItem(key) || "[]") as Partial<B2BCartItem>[])
+        .map(materialize)
+        .filter((i): i is B2BCartItem => !!i);
+    } catch {}
+    current.current = rows;
+    setItems(rows);
+    setLoaded(key);
   }, [key]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(key, JSON.stringify(items));
-  }, [items, key, hydrated]);
-
-  const value = useMemo<B2BCartContextType>(() => {
-    const addBulkToCart = (product: B2BProduct, quantity: number, offer?: DistributorOffer) => {
-      const qty = clampBulkQty(product, quantity);
-      const price = offer?.price ?? product.b2bPrice;
-      const k = lineKey(product.id, offer?.distributorId);
-      setItems((prev) => {
-        const existing = prev.find((i) => i.key === k);
-        if (existing) {
-          return prev.map((i) =>
-            i.key === k ? { ...i, quantity: i.quantity + qty, price } : i,
-          );
-        }
-        return [
-          ...prev,
-          {
-            key: k,
-            productId: product.id,
-            name: product.name,
-            image: product.image,
-            unit: product.unit,
-            quantity: qty,
-            price,
-            moq: product.moq,
-            ...(product.offer ? { offer: product.offer } : {}),
-            ...(offer
-              ? { distributorId: offer.distributorId, distributorName: offer.distributorName }
-              : {}),
-          },
-        ];
-      });
-    };
-
-    return {
-      items,
-      addBulkToCart,
-      setQuantity: (k, quantity) =>
-        setItems((prev) => prev.map((i) => (i.key === k ? { ...i, quantity } : i))),
-      removeItem: (k) => setItems((prev) => prev.filter((i) => i.key !== k)),
-      clearCart: () => setItems([]),
-      count: items.reduce((n, i) => n + i.quantity, 0),
-      subtotal: items.reduce((n, i) => n + i.price * i.quantity, 0),
-      toOrderItems: () =>
-        items.map((i) => ({
-          productId: i.productId,
-          name: i.name,
-          quantity: i.quantity,
-          unitPrice: i.price,
-          unit: i.unit,
-          image: i.image,
-          ...(i.distributorName ? { distributor: i.distributorName } : {}),
-        })),
-    };
-  }, [items]);
-
-
-  return <B2BCartContext.Provider value={value}>{children}</B2BCartContext.Provider>;
+  function commit(rows: B2BCartItem[]) {
+    if (loaded !== key) return false;
+    try {
+      appStorage.setItem(key, JSON.stringify(rows));
+      current.current = rows;
+      setItems(rows);
+      return true;
+    } catch {
+      toast.error("Could not save your basket. Please allow browser storage.");
+      return false;
+    }
+  }
+  function checked(rows: B2BCartItem[]) {
+    try {
+      validateCombinedStock(rows.map(orderItem), getB2BProduct);
+      return commit(rows);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Check your quantities");
+      return false;
+    }
+  }
+  function addBulkToCart(
+    p: B2BProduct,
+    qty: number,
+    offer?: DistributorOffer,
+    variantId = "standard"
+  ) {
+    const supplier = offer || availableOffers(p)[0];
+    if (!supplier) {
+      toast.error("No available supplier for this product");
+      return false;
+    }
+    const id = `${p.id}::${supplier.distributorId}::${variantId}`;
+    const old = current.current.find((i) => i.key === id);
+    const line = materialize({
+      productId: p.id,
+      quantity: (old?.quantity || 0) + qty,
+      distributorId: supplier.distributorId,
+      variantId,
+    });
+    if (!line) return false;
+    return checked([...current.current.filter((i) => i.key !== id), line]);
+  }
+  function setQuantity(id: string, qty: number) {
+    const rows = current.current.map((i) =>
+      i.key === id ? materialize({ ...i, quantity: qty })! : i
+    );
+    checked(rows);
+  }
+  const total = orderTotals(items.map(orderItem));
+  return (
+    <Context.Provider
+      value={{
+        items,
+        addBulkToCart,
+        setQuantity,
+        removeItem: (id) => {
+          commit(current.current.filter((i) => i.key !== id));
+        },
+        clearCart: () => {
+          commit([]);
+        },
+        consumeOrder: (order) => {
+          const marker = "boxaio_consumed_" + order.id;
+          if (appStorage.getItem(marker)) return;
+          const next = current.current
+            .map((i) => ({
+              ...i,
+              quantity: Math.max(
+                0,
+                i.quantity - (order.quote.items.find((l) => l.key === i.key)?.quantity || 0)
+              ),
+            }))
+            .filter((i) => i.quantity > 0);
+          if (commit(next)) appStorage.setItem(marker, "1");
+        },
+        count: items.reduce((s, i) => s + i.quantity, 0),
+        subtotal: total.subtotal,
+        toOrderItems: () => current.current.map(orderItem),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
 }
-
 export function useB2BCart() {
-  const ctx = useContext(B2BCartContext);
-  if (!ctx) throw new Error("useB2BCart must be used within B2BCartProvider");
+  const ctx = useContext(Context);
+  if (!ctx) throw new Error("Bulk cart provider required");
   return ctx;
 }

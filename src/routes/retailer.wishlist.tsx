@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
 import { getB2BProduct } from "@/retailer/b2b/service";
 import { useB2BWishlist } from "@/retailer/b2b/wishlist";
 

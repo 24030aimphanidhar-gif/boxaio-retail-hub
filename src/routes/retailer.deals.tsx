@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
 import { B2B_PRODUCTS } from "@/retailer/b2b/service";
 
 export const Route = createFileRoute("/retailer/deals")({

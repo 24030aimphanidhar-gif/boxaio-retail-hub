@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Mock data lives in `backend/data/*.json`; `scripts/prepare-static.mjs` builds `public/mock-data/catalogue.json`, and `__root.tsx` runs `bootstrapData()` before rendering the app — keeps one editable data source for both Lovable preview and static IIS hosting.

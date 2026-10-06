@@ -1,199 +1,157 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, Search, Store } from "lucide-react";
-import { useMemo, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { DistributorProductRow } from "@/components/retailer/DistributorProductRow";
+import { useState } from "react";
+import { ArrowLeft, Search, MapPin, Store } from "lucide-react";
 import {
-  DEFAULT_RETAILER_LOCATION,
-  canViewCatalogue,
-  distanceKm,
   getDistributor,
+  canViewCatalogue,
   productsByDistributor,
-  readRetailerLocation,
+  distanceKm,
 } from "@/retailer/b2b/service";
-import { useRetailerSession } from "@/retailer/hooks";
-
-type CatalogueSearch = { from?: "nearby" | "other" | "browse" };
-
+import { useBusinessLocation } from "@/retailer/b2b/location";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
+import { BusinessLocation } from "@/components/retailer/BusinessLocation";
 export const Route = createFileRoute("/retailer/distributors/$distributorId/catalogue")({
-  validateSearch: (search: Record<string, unknown>): CatalogueSearch =>
-    search["from"] === "nearby" || search["from"] === "other" || search["from"] === "browse"
-      ? { from: search["from"] }
-      : {},
-  head: () => ({
-    meta: [
-      { title: "Distributor Catalogue | BOXAIO Business" },
-      {
-        name: "description",
-        content: "Browse a distributor's wholesale catalogue and add products to your bulk cart.",
-      },
-      { property: "og:title", content: "Distributor Catalogue | BOXAIO Business" },
-      {
-        property: "og:description",
-        content: "Distributor-wise wholesale products with B2B price, MOQ, stock and offers.",
-      },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  validateSearch: (s: Record<string, unknown>): { from?: "nearby" | "other" | "browse" } =>
+    s.from === "nearby" || s.from === "other" || s.from === "browse" ? { from: s.from } : {},
   component: DistributorCatalogue,
 });
-
-const BACK_LABEL: Record<string, string> = {
-  nearby: "Back to Nearby Distributors",
-  other: "Back to Other Catalogues",
-  browse: "Back to Distributors",
-};
-
 function DistributorCatalogue() {
   const { distributorId } = Route.useParams();
   const { from } = Route.useSearch();
-  const { user } = useRetailerSession();
-  const distributor = getDistributor(distributorId);
-
+  const d = getDistributor(distributorId);
+  const { location } = useBusinessLocation();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [brand, setBrand] = useState("all");
-  const [visible, setVisible] = useState(20);
-
-  const products = useMemo(
-    () => (distributor ? productsByDistributor(distributor.id) : []),
-    [distributor],
-  );
-
-  const categories = useMemo(
-    () => [...new Set(products.map((p) => p.category))].sort(),
-    [products],
-  );
-  const brands = useMemo(() => [...new Set(products.map((p) => p.brand))].sort(), [products]);
-
-  const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return products.filter(
+  const [sort, setSort] = useState("name");
+  const [stock, setStock] = useState(false);
+  const all = productsByDistributor(distributorId);
+  const rows = all
+    .filter(
       (p) =>
         (category === "all" || p.category === category) &&
-        (brand === "all" || p.brand === brand) &&
-        (!q ||
-          p.name.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q)),
+        (!stock ||
+          (p.offers.find((o) => o.distributorId === distributorId)?.stock || 0) >= p.moq) &&
+        `${p.name} ${p.brand} ${p.sku}`.toLowerCase().includes(query.toLowerCase())
+    )
+    .sort((a, b) =>
+      sort === "price"
+        ? (a.offers.find((o) => o.distributorId === distributorId)?.price || 0) -
+          (b.offers.find((o) => o.distributorId === distributorId)?.price || 0)
+        : a.name.localeCompare(b.name)
     );
-  }, [products, query, category, brand]);
-
-  const backTo =
-    from === "nearby" || from === "other" ? "/retailer/catalogue" : "/retailer/distributors";
-
-  if (!distributor) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <p className="text-sm text-muted-foreground">This distributor is no longer available.</p>
-        <Link to="/retailer/distributors" className="mt-4 inline-block">
-          <Button variant="outline">Back to Distributors</Button>
-        </Link>
-      </div>
-    );
-  }
-
-  const location = readRetailerLocation(user?.email ?? "") ?? DEFAULT_RETAILER_LOCATION;
-  const km = distanceKm(location, {
-    lat: distributor.latitude,
-    lng: distributor.longitude,
-  });
-
-  if (!canViewCatalogue(distributor)) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="text-xl font-bold text-foreground">{distributor.businessName}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Catalogue access requires distributor approval.
-        </p>
-        <Link to={backTo} className="mt-4 inline-block">
-          <Button variant="outline">{BACK_LABEL[from ?? "browse"]}</Button>
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="wrap business-page">
       <Link
-        to={backTo}
-        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+        to={
+          from === "nearby" || from === "other" ? "/retailer/catalogue" : "/retailer/distributors"
+        }
+        search={from === "nearby" || from === "other" ? { tab: from } : {}}
+        className="back-link"
       >
-        <ArrowLeft className="size-4" /> {BACK_LABEL[from ?? "browse"]}
+        <ArrowLeft size={14} /> Back to{" "}
+        {from === "nearby"
+          ? "nearby distributors"
+          : from === "other"
+            ? "other catalogues"
+            : "distributors"}
       </Link>
-
-      <div className="mt-4 flex items-center gap-3">
-        <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Store className="size-6" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{distributor.businessName}</h1>
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="size-3.5" /> {distributor.area} · {km.toFixed(1)} KM ·{" "}
-            {products.length} products
+      {!d || !canViewCatalogue(d) ? (
+        <div className="empty-state">
+          <Store size={34} />
+          <h1>{d?.name || "Distributor not found"}</h1>
+          <p>
+            {d?.status === "inactive"
+              ? "This supplier is offline."
+              : "This catalogue is unavailable or requires approval."}
           </p>
+          <Link to="/retailer/distributors" className="outline-button">
+            Find another supplier
+          </Link>
         </div>
-      </div>
-
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products…"
-            className="pl-9"
-          />
-        </div>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-        >
-          <option value="all">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-        >
-          <option value="all">All brands</option>
-          {brands.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <p className="mt-3 text-xs text-muted-foreground">{rows.length} products</p>
-
-      <div className="mt-3 space-y-3">
-        {rows.slice(0, visible).map((p) => (
-          <DistributorProductRow key={p.id} product={p} preferredDistributorId={distributor.id} />
-        ))}
-        {rows.length === 0 ? (
-          <Card className="p-8 text-center text-sm text-muted-foreground">
-            No products match your search in this catalogue.
-          </Card>
-        ) : null}
-      </div>
-
-      {visible < rows.length ? (
-        <div className="mt-6 flex justify-center">
-          <Button variant="outline" onClick={() => setVisible((v) => v + 20)}>
-            Load more
-          </Button>
-        </div>
-      ) : null}
+      ) : (
+        <>
+          <div className="supplier-hero">
+            <div className="supplier-monogram">{d.name.slice(0, 2)}</div>
+            <div>
+              <span className="eyebrow">DISTRIBUTOR CATALOGUE</span>
+              <h1>{d.businessName}</h1>
+              <p>
+                <MapPin size={14} />
+                {d.address} ·{" "}
+                {distanceKm(location, { lat: d.latitude, lng: d.longitude }).toFixed(1)} km from
+                your location
+              </p>
+            </div>
+            <div>
+              <strong>{all.length}</strong>
+              <small>products available</small>
+            </div>
+          </div>
+          <BusinessLocation />
+          <div className="business-toolbar">
+            <label className="business-search">
+              <Search size={16} />
+              <input
+                aria-label="Search distributor catalogue"
+                placeholder="Search products, brands, or SKU"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <select
+              aria-label="Distributor product category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="all">All categories</option>
+              {[...new Set(all.map((p) => p.category))].map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Sort distributor products"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="name">Name A–Z</option>
+              <option value="price">Supplier price: low first</option>
+            </select>
+            <label className="stock-filter">
+              <input type="checkbox" checked={stock} onChange={(e) => setStock(e.target.checked)} />{" "}
+              In stock
+            </label>
+          </div>
+          <p className="business-count">
+            {rows.length} products · {d.name} is preselected. Open a product to compare packs and
+            other suppliers.
+          </p>
+          <div className="wholesale-grid">
+            {rows.map((p) => (
+              <RetailerProductCard
+                key={p.id + "-" + d.id}
+                product={p}
+                preferredDistributorId={d.id}
+              />
+            ))}
+          </div>
+          {!rows.length && (
+            <div className="empty-state">
+              <Search size={30} />
+              <h2>No products match</h2>
+              <button
+                className="outline-button"
+                onClick={() => {
+                  setQuery("");
+                  setCategory("all");
+                  setStock(false);
+                }}
+              >
+                Reset filters
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -5,7 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { EmptyState, LoadingRows, PageHeader, Pill } from "@/retailer/components/ui-bits";
 import { fetchProducts, updateProduct } from "@/retailer/data/service";
 import { formatCurrency, useAsync, useRetailerSession } from "@/retailer/hooks";
@@ -24,7 +30,7 @@ function RetailerProducts() {
 
   const categories = useMemo(
     () => [...new Set((data ?? []).map((p) => p.category))].sort(),
-    [data],
+    [data]
   );
 
   const rows = useMemo(() => {
@@ -65,16 +71,22 @@ function RetailerProducts() {
           className="lg:max-w-xs"
         />
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="lg:w-64"><SelectValue placeholder="Category" /></SelectTrigger>
+          <SelectTrigger className="lg:w-64">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="lg:w-56"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="lg:w-56">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -88,7 +100,10 @@ function RetailerProducts() {
       {loading ? (
         <LoadingRows rows={8} />
       ) : rows.length === 0 ? (
-        <EmptyState title="No products match" description="Adjust your filters or add a new product." />
+        <EmptyState
+          title="No products match"
+          description="Adjust your filters or add a new product."
+        />
       ) : (
         <Card className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-sm">
@@ -107,7 +122,12 @@ function RetailerProducts() {
                 <tr key={p.id} className="hover:bg-muted/30">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <img src={p.imageUrl} alt={p.name} className="size-10 rounded-lg object-cover" loading="lazy" />
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className="size-10 rounded-lg object-cover"
+                        loading="lazy"
+                      />
                       <div className="min-w-0">
                         <p className="truncate font-medium text-foreground">{p.name}</p>
                         <p className="text-xs text-muted-foreground">{p.sku}</p>
@@ -117,7 +137,9 @@ function RetailerProducts() {
                   <td className="px-4 py-3 text-muted-foreground">{p.category}</td>
                   <td className="px-4 py-3">
                     <span className="font-semibold">{formatCurrency(p.sellingPrice)}</span>{" "}
-                    <span className="text-xs text-muted-foreground line-through">{formatCurrency(p.mrp)}</span>
+                    <span className="text-xs text-muted-foreground line-through">
+                      {formatCurrency(p.mrp)}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     {stockStatus(p) === "out_of_stock" ? (
@@ -134,12 +156,16 @@ function RetailerProducts() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <Link to="/retailer/products/$productId" params={{ productId: p.id }}>
-                        <Button size="sm" variant="outline">Edit</Button>
+                        <Button size="sm" variant="outline">
+                          Edit
+                        </Button>
                       </Link>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => toggleStatus(p.id, p.status === "active" ? "inactive" : "active")}
+                        onClick={() =>
+                          toggleStatus(p.id, p.status === "active" ? "inactive" : "active")
+                        }
                       >
                         {p.status === "active" ? "Hide" : "Publish"}
                       </Button>

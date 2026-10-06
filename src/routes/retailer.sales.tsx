@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { Card } from "@/components/ui/card";
 import { LoadingRows, PageHeader, StatCard } from "@/retailer/components/ui-bits";
@@ -26,7 +36,10 @@ function Sales() {
 
   return (
     <div>
-      <PageHeader title="Sales & analytics" description="Understand how your store is performing." />
+      <PageHeader
+        title="Sales & analytics"
+        description="Understand how your store is performing."
+      />
 
       <div className="mb-6 flex gap-2 overflow-x-auto">
         {RANGES.map((r) => (
@@ -45,17 +58,34 @@ function Sales() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Net sales" value={data ? formatCurrency(data.netSales) : "—"} tone="success" />
-        <StatCard label="Gross sales" value={data ? formatCurrency(data.grossSales) : "—"} tone="primary" />
+        <StatCard
+          label="Net sales"
+          value={data ? formatCurrency(data.netSales) : "—"}
+          tone="success"
+        />
+        <StatCard
+          label="Gross sales"
+          value={data ? formatCurrency(data.grossSales) : "—"}
+          tone="primary"
+        />
         <StatCard label="Orders" value={data?.orderCount ?? "—"} />
-        <StatCard label="Average order value" value={data ? formatCurrency(data.averageOrderValue) : "—"} />
-        <StatCard label="Discounts given" value={data ? formatCurrency(data.discounts) : "—"} tone="warning" />
+        <StatCard
+          label="Average order value"
+          value={data ? formatCurrency(data.averageOrderValue) : "—"}
+        />
+        <StatCard
+          label="Discounts given"
+          value={data ? formatCurrency(data.discounts) : "—"}
+          tone="warning"
+        />
         <StatCard label="GST collected" value={data ? formatCurrency(data.gst) : "—"} />
         <StatCard label="Delivery fees" value={data ? formatCurrency(data.delivery) : "—"} />
       </div>
 
       {loading ? (
-        <div className="mt-6"><LoadingRows rows={4} /></div>
+        <div className="mt-6">
+          <LoadingRows rows={4} />
+        </div>
       ) : (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <Card className="p-5">
@@ -63,11 +93,21 @@ function Sales() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data?.series ?? []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="label" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis fontSize={12} width={64} tickLine={false} axisLine={false} />
                   <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  <Line type="monotone" dataKey="sales" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="sales"
+                    stroke="var(--color-primary)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -77,7 +117,11 @@ function Sales() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data?.series ?? []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="label" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis fontSize={12} width={40} tickLine={false} axisLine={false} />
                   <Tooltip />

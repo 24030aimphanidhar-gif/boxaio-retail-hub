@@ -2,7 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EmptyState, LoadingRows, OrderStatusBadge, PageHeader } from "@/retailer/components/ui-bits";
+import {
+  EmptyState,
+  LoadingRows,
+  OrderStatusBadge,
+  PageHeader,
+} from "@/retailer/components/ui-bits";
 import { fetchOrders } from "@/retailer/data/service";
 import { formatCurrency, formatDate, useAsync, useRetailerSession } from "@/retailer/hooks";
 
@@ -17,15 +22,24 @@ function Delivery() {
 
   return (
     <div>
-      <PageHeader title="Delivery tracking" description="Orders handed to a delivery partner or waiting for pickup." />
+      <PageHeader
+        title="Delivery tracking"
+        description="Orders handed to a delivery partner or waiting for pickup."
+      />
       {loading ? (
         <LoadingRows rows={5} />
       ) : rows.length === 0 ? (
-        <EmptyState title="Nothing in transit" description="Orders appear here once they are ready for pickup." />
+        <EmptyState
+          title="Nothing in transit"
+          description="Orders appear here once they are ready for pickup."
+        />
       ) : (
         <div className="space-y-3">
           {rows.map((order) => (
-            <Card key={order.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <Card
+              key={order.id}
+              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div>
                 <div className="flex items-center gap-2">
                   <p className="font-semibold">#{order.id}</p>
@@ -41,7 +55,9 @@ function Delivery() {
               <div className="flex items-center gap-3">
                 <span className="font-semibold">{formatCurrency(order.total)}</span>
                 <Link to="/retailer/orders/$orderId" params={{ orderId: order.id }}>
-                  <Button size="sm" variant="outline">Open</Button>
+                  <Button size="sm" variant="outline">
+                    Open
+                  </Button>
                 </Link>
               </div>
             </Card>

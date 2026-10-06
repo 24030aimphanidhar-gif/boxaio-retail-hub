@@ -23,14 +23,26 @@ function Offers() {
 
   const create = async () => {
     if (!name.trim()) return toast.error("Give your offer a name");
-    await saveOffer(storeId, { name, type: "percentage", discountValue: value, minOrderValue: minOrder, status: "active" });
+    await saveOffer(storeId, {
+      name,
+      type: "percentage",
+      discountValue: value,
+      minOrderValue: minOrder,
+      status: "active",
+    });
     toast.success("Offer created");
     setName("");
     reload();
   };
 
   const tone = (status: string) =>
-    status === "active" ? "success" : status === "scheduled" ? "info" : status === "expired" ? "muted" : "warning";
+    status === "active"
+      ? "success"
+      : status === "scheduled"
+        ? "info"
+        : status === "expired"
+          ? "muted"
+          : "warning";
 
   return (
     <div>
@@ -39,17 +51,34 @@ function Offers() {
       <Card className="mb-6 grid gap-4 p-5 sm:grid-cols-4 sm:items-end">
         <div className="space-y-1.5 sm:col-span-2">
           <Label className="text-xs text-muted-foreground">Offer name</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Weekend fresh deal" />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Weekend fresh deal"
+          />
         </div>
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">Discount %</Label>
-          <Input type="number" min={1} max={90} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+          <Input
+            type="number"
+            min={1}
+            max={90}
+            value={value}
+            onChange={(e) => setValue(Number(e.target.value))}
+          />
         </div>
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">Min order ₹</Label>
-          <Input type="number" min={0} value={minOrder} onChange={(e) => setMinOrder(Number(e.target.value))} />
+          <Input
+            type="number"
+            min={0}
+            value={minOrder}
+            onChange={(e) => setMinOrder(Number(e.target.value))}
+          />
         </div>
-        <Button className="sm:col-span-4 sm:w-40" onClick={create}>Create offer</Button>
+        <Button className="sm:col-span-4 sm:w-40" onClick={create}>
+          Create offer
+        </Button>
       </Card>
 
       {loading ? (
@@ -59,15 +88,20 @@ function Offers() {
       ) : (
         <div className="space-y-3">
           {(data ?? []).map((offer) => (
-            <Card key={offer.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <Card
+              key={offer.id}
+              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-semibold text-foreground">{offer.name}</p>
                   <Pill tone={tone(offer.status) as never}>{offer.status}</Pill>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {offer.type === "percentage" ? `${offer.discountValue}% off` : `₹${offer.discountValue} off`} · min order ₹
-                  {offer.minOrderValue} · used {offer.used}/{offer.usageLimit}
+                  {offer.type === "percentage"
+                    ? `${offer.discountValue}% off`
+                    : `₹${offer.discountValue} off`}{" "}
+                  · min order ₹{offer.minOrderValue} · used {offer.used}/{offer.usageLimit}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -75,7 +109,10 @@ function Offers() {
                   size="sm"
                   variant="outline"
                   onClick={async () => {
-                    await saveOffer(storeId, { id: offer.id, status: offer.status === "active" ? "disabled" : "active" });
+                    await saveOffer(storeId, {
+                      id: offer.id,
+                      status: offer.status === "active" ? "disabled" : "active",
+                    });
                     reload();
                   }}
                 >

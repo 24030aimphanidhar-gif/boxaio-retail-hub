@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { ProductDetails } from "@/pages/ProductDetails";
+import { ProductDetails } from "@/features/consumer/pages/ProductDetails";
 
 export const Route = createFileRoute("/products/$id")({
   head: () => ({

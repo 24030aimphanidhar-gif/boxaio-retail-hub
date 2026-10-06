@@ -1,3 +1,5 @@
+import { mockData } from "@/api/bootstrap-data";
+import { appStorage } from "@/api/storage";
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
 /**
@@ -49,11 +51,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const STORAGE_KEY = "boxaio_user";
 
 /** Demo directory used until the backend auth service is wired up. */
-const KNOWN_ACCOUNTS: Record<string, { role: UserRole; name: string; storeId?: string }> = {
-  "retailer@boxaio.com": { role: "retailer", name: "Vijayawada Fresh Mart", storeId: "store-vja-01" },
-  "retailer2@boxaio.com": { role: "retailer", name: "Hyderabad Daily Needs", storeId: "store-hyd-01" },
-  "admin@boxaio.com": { role: "admin", name: "BOXAIO Admin" },
-};
+const KNOWN_ACCOUNTS: Record<string, { role: UserRole; name: string; storeId?: string }> =
+  Object.fromEntries(
+    mockData.accounts.map((a) => [
+      a.email,
+      { role: a.role as UserRole, name: a.name, storeId: a.storeId },
+    ])
+  );
 
 function roleToUserType(role: UserRole): UserType {
   return role === "customer" ? "consumer" : role;
@@ -81,25 +85,29 @@ export function homeRouteForRole(role: UserRole): string {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   // Read persisted session after hydration to keep SSR output stable.
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return;
-      const parsed = JSON.parse(stored) as User;
-      const role = normalizeRole(parsed.role ?? parsed.userType);
-      setUser({ ...parsed, role, userType: roleToUserType(role) });
+      const stored = appStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as User;
+        const role = normalizeRole(parsed.role ?? parsed.userType);
+        setUser({ ...parsed, role, userType: roleToUserType(role) });
+      }
     } catch {
       /* ignore malformed session */
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    else localStorage.removeItem(STORAGE_KEY);
-  }, [user]);
+    if (typeof window === "undefined" || !hydrated) return;
+    if (user) appStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    else appStorage.removeItem(STORAGE_KEY);
+  }, [user, hydrated]);
 
   const login = (email: string) => {
     const key = email.trim().toLowerCase();
