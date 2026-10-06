@@ -1,1 +1,1 @@
-export * from '../../../../backend/src/domain/pricing';
+export * from '../../../backend/src/domain/pricing';

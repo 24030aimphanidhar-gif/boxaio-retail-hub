@@ -37,8 +37,8 @@ export type { DistributorWithDistance } from "./distributors";
 import { DISTRIBUTORS } from "./distributors";
 import { availableOffers, quoteProduct, orderTotals, validateCombinedStock } from "./pricing";
 
-export {B2B_PRODUCTS,getB2BProduct} from '../../../../backend/src/domain/catalogue';
-import {B2B_PRODUCTS,getB2BProduct} from '../../../../backend/src/domain/catalogue';
+export {B2B_PRODUCTS,getB2BProduct} from '../../../backend/src/domain/catalogue';
+import {B2B_PRODUCTS,getB2BProduct} from '../../../backend/src/domain/catalogue';
 export function productsByDistributor(distributorId: string) {
   return B2B_PRODUCTS.filter((p) => p.offers.some((o) => o.distributorId === distributorId));
 }

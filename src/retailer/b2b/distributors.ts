@@ -11,8 +11,8 @@ import type { Distributor, LatLng } from "./types";
 /** Vijayawada city centre — the demo retailer neighbourhood. */
 export const DEFAULT_RETAILER_LOCATION: LatLng = { lat: 16.5062, lng: 80.648 };
 
-export {DISTRIBUTORS} from '../../../../backend/src/domain/catalogue';
-import {DISTRIBUTORS} from '../../../../backend/src/domain/catalogue';
+export {DISTRIBUTORS} from '../../../backend/src/domain/catalogue';
+import {DISTRIBUTORS} from '../../../backend/src/domain/catalogue';
 export function getDistributor(id: string): Distributor | null {
   return DISTRIBUTORS.find((x) => x.id === id) ?? null;
 }

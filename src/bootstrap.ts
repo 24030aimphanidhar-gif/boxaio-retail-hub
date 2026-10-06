@@ -1,6 +1,6 @@
 import { api } from "./api/client";
 import { mockData, configureMockData } from "./api/bootstrap-data";
-import { configureCatalogue } from "../../backend/src/domain/catalogue";
+import { configureCatalogue } from "../backend/src/domain/catalogue";
 import { hydrateState, flushState } from "./api/storage";
 import type { Ledger } from "./features/checkout/types";
 export async function bootstrapData() {

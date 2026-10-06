@@ -1,7 +1,7 @@
 import {appStorage} from '@/api/storage';
 import type {Address} from './types';
 import {mockData} from '@/api/bootstrap-data';
-export {validateAddress} from '../../../../backend/src/domain/addresses';
+export {validateAddress} from '../../../backend/src/domain/addresses';
 export const DEMO_ADDRESS=mockData.addresses[0] as Address;
 export function readAddresses(): Address[] {
   try {

@@ -1,8 +1,8 @@
 import type { mockData } from './bootstrap-data';
 import type { Ledger } from '../features/checkout/types';
-import { configureCatalogue } from '../../../backend/src/domain/catalogue';
-import { configureLedger, balanceFor } from '../../../backend/src/domain/ledger';
-import * as engine from '../../../backend/src/domain/checkout';
+import { configureCatalogue } from '../../backend/src/domain/catalogue';
+import { configureLedger, balanceFor } from '../../backend/src/domain/ledger';
+import * as engine from '../../backend/src/domain/checkout';
 
 const ledgerKey = 'boxaio_checkout_v1';
 function readLedger(): Ledger {
