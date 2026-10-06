@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingCart, Store, Tag } from "lucide-react";
 import { toast } from "sonner";
+
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -45,8 +47,13 @@ export function RetailerProductCard({
 
   return (
     <Card className="flex h-full flex-col overflow-hidden rounded-2xl border-border bg-card transition-shadow hover:shadow-lg">
-      {/* Top: horizontal image + info */}
-      <div className="flex">
+      {/* Top: horizontal image + info (clicking opens the product overview) */}
+      <Link
+        to="/retailer/product/$productId"
+        params={{ productId: product.id }}
+        className="flex"
+        aria-label={`View ${product.name}`}
+      >
         <div className="relative w-[42%] shrink-0 overflow-hidden sm:w-[45%]">
           <img
             src={product.image}
@@ -63,7 +70,11 @@ export function RetailerProductCard({
           <button
             type="button"
             aria-label="Save to business wishlist"
-            onClick={() => toggle(product.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggle(product.id);
+            }}
             className="absolute right-2 top-2 rounded-full p-1"
           >
             <Heart
@@ -112,7 +123,7 @@ export function RetailerProductCard({
 
           {footer}
         </div>
-      </div>
+      </Link>
 
       {/* Bottom: full-width bulk quantity + add to cart */}
       <div className="mt-auto space-y-2 border-t border-border p-3">
