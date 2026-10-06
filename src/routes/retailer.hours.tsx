@@ -42,15 +42,25 @@ function BusinessHours() {
       />
       <Card className="divide-y divide-border">
         {hours.map((h) => (
-          <div key={h.day} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div
+            key={h.day}
+            className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
             <p className="w-32 font-medium text-foreground">{h.day}</p>
             <div className="flex flex-wrap items-center gap-4">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Switch checked={!h.closed} onCheckedChange={(v) => update(h.day, { closed: !v })} />
+                <Switch
+                  checked={!h.closed}
+                  onCheckedChange={(v) => update(h.day, { closed: !v })}
+                />
                 {h.closed ? "Closed" : "Open"}
               </label>
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Switch checked={h.open24h} disabled={h.closed} onCheckedChange={(v) => update(h.day, { open24h: v })} />
+                <Switch
+                  checked={h.open24h}
+                  disabled={h.closed}
+                  onCheckedChange={(v) => update(h.day, { open24h: v })}
+                />
                 24 hours
               </label>
               <div className="flex items-center gap-2">

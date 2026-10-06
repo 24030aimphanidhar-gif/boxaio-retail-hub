@@ -20,11 +20,16 @@ function Reviews() {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const rows = data ?? [];
-  const average = rows.length ? (rows.reduce((s, r) => s + r.rating, 0) / rows.length).toFixed(1) : "—";
+  const average = rows.length
+    ? (rows.reduce((s, r) => s + r.rating, 0) / rows.length).toFixed(1)
+    : "—";
 
   return (
     <div>
-      <PageHeader title="Reviews & ratings" description={`Average rating ${average} across ${rows.length} reviews.`} />
+      <PageHeader
+        title="Reviews & ratings"
+        description={`Average rating ${average} across ${rows.length} reviews.`}
+      />
       {loading ? (
         <LoadingRows rows={5} />
       ) : rows.length === 0 ? (
@@ -38,7 +43,9 @@ function Reviews() {
                   {review.rating} <Star className="size-3.5 fill-current" />
                 </span>
                 <p className="font-medium text-foreground">{review.productName}</p>
-                <Pill tone={review.status === "published" ? "success" : "warning"}>{review.status}</Pill>
+                <Pill tone={review.status === "published" ? "success" : "warning"}>
+                  {review.status}
+                </Pill>
                 <span className="text-xs text-muted-foreground">
                   {review.customerName} · {formatDate(review.createdAt)}
                 </span>

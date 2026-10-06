@@ -1,348 +1,280 @@
+import { useSavedWholesale } from "@/features/wholesale/useSavedWholesale";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
+import { B2B_PRODUCTS } from "@/retailer/b2b/service";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PackageSearch, MapPin, Search, Sparkles, Clock } from "lucide-react";
-import { useMemo, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { QuickReorder } from "@/components/retailer/QuickReorder";
-import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
+import { useState } from "react";
+import { Download, Search, Package, Store, Repeat } from "lucide-react";
+import { RetailerCatalogueCard } from "@/features/wholesale/components/RetailerCatalogueCard";
 import { DistributorGrid } from "@/components/retailer/DistributorDirectory";
-import {
-  DEFAULT_RETAILER_LOCATION,
-  NEARBY_RADIUS_KM,
-  distributorsWithDistance,
-  fetchMyCatalogue,
-  fetchMyOrders,
-  frequentlyPurchased,
-  nearbyDistributors,
-  readRetailerLocation,
-  recentlyPurchased,
-  saveRetailerLocation,
-} from "@/retailer/b2b/service";
+import { BusinessLocation } from "@/components/retailer/BusinessLocation";
+import { QuickReorder } from "@/features/wholesale/components/QuickReorder";
+import { fetchMyCatalogue, fetchMyOrders, distributorsWithDistance } from "@/retailer/b2b/service";
+import { useBusinessLocation } from "@/retailer/b2b/location";
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
-
 export const Route = createFileRoute("/retailer/catalogue")({
-  head: () => ({
-    meta: [
-      { title: "My Product Catalogue | BOXAIO Business" },
-      {
-        name: "description",
-        content:
-          "Your personal BOXAIO wholesale catalogue — every product you have purchased, ready to reorder in bulk.",
-      },
-      { property: "og:title", content: "My Product Catalogue | BOXAIO Business" },
-      {
-        property: "og:description",
-        content: "Reorder your frequently and recently purchased wholesale products in seconds.",
-      },
-      { name: "robots", content: "noindex" },
-    ],
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: typeof s.tab === "string" ? s.tab : "mine",
   }),
-  component: MyProductCatalogue,
+  component: MyCatalogue,
 });
-
-function MyProductCatalogue() {
+function MyCatalogue() {
+  const saved = useSavedWholesale();
   const { user } = useRetailerSession();
-  const email = user?.email ?? "";
+  const email = user?.email || "";
   const catalogue = useAsync(() => fetchMyCatalogue(email), [email]);
   const orders = useAsync(() => fetchMyOrders(email), [email]);
-
-  const [tab, setTab] = useState<"mine" | "nearby" | "other">("mine");
+  const { tab } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const { location } = useBusinessLocation();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [availability, setAvailability] = useState("all");
-  const [sort, setSort] = useState("frequent");
-
-  const entries = catalogue.data ?? [];
-  const categories = useMemo(
-    () => [...new Set(entries.map((e) => e.product.category))].sort(),
-    [entries],
+  const [sort, setSort] = useState("recent");
+  const [radius, setRadius] = useState(5);
+  const entries = catalogue.data || [];
+  const filtered = entries
+    .filter(
+      (e) =>
+        (category === "all" || e.product.category === category) &&
+        `${e.product.name} ${e.product.brand} ${e.product.sku}`
+          .toLowerCase()
+          .includes(query.toLowerCase())
+    )
+    .sort((a, b) =>
+      sort === "frequent"
+        ? b.purchaseCount - a.purchaseCount
+        : sort === "name"
+          ? a.product.name.localeCompare(b.product.name)
+          : +new Date(b.lastPurchasedAt) - +new Date(a.lastPurchasedAt)
+    );
+  const distributors = distributorsWithDistance(location).filter(
+    (d) =>
+      d.status === "active" &&
+      (tab === "nearby" ? d.distanceKm <= radius : d.distanceKm > radius) &&
+      `${d.name} ${d.area}`.toLowerCase().includes(query.toLowerCase())
   );
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let rows = entries.filter((e) => {
-      const p = e.product;
-      const matches =
-        !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q);
-      const inCategory = category === "all" || p.category === category;
-      const inStock =
-        availability === "all" ||
-        (availability === "in" ? p.stock > 0 : p.stock <= 0);
-      return matches && inCategory && inStock;
-    });
-    if (sort === "frequent") rows = [...rows].sort((a, b) => b.purchaseCount - a.purchaseCount);
-    if (sort === "recent")
-      rows = [...rows].sort((a, b) => +new Date(b.lastPurchasedAt) - +new Date(a.lastPurchasedAt));
-    if (sort === "name") rows = [...rows].sort((a, b) => a.product.name.localeCompare(b.product.name));
-    if (sort === "price_low") rows = [...rows].sort((a, b) => a.product.b2bPrice - b.product.b2bPrice);
-    return rows;
-  }, [entries, query, category, availability, sort]);
-
-  const deliveredOrders = (orders.data ?? []).filter((o) => o.status === "delivered").slice(0, 3);
-
+  function download() {
+    const rows = [
+      ["Product", "SKU", "Last pack", "Last quantity", "Last price", "Purchase count"],
+      ...filtered.map((e) => [
+        e.product.name,
+        e.product.sku,
+        e.lastUnit || e.product.unit,
+        e.lastPurchasedQty,
+        e.lastPurchasedPrice,
+        e.purchaseCount,
+      ]),
+    ];
+    const csv = rows
+      .map((r) => r.map((c) => '"' + String(c).replaceAll('"', '""') + '"').join(","))
+      .join("\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "boxaio-my-catalogue.csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="wrap business-page">
+      <div className="business-page-heading">
         <div>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">My Product Catalogue</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Every product your business has purchased from BOXAIO — saved automatically, always at
-            today&apos;s wholesale price.
+          <span className="eyebrow">BUILT AROUND YOUR BUSINESS</span>
+          <h1>My product catalogue</h1>
+          <p>
+            Your purchased essentials, supplier prices, and nearby catalogues. All in one place.
           </p>
         </div>
-        <Link to="/retailer/shop">
-          <Button variant="outline">Browse full wholesale shop</Button>
-        </Link>
+        <button className="outline-button" disabled={!filtered.length} onClick={download}>
+          <Download size={15} /> Export catalogue
+        </button>
       </div>
-
-      <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
-        {(
-          [
-            ["mine", "My Products"],
-            ["nearby", "Nearby Distributors"],
-            ["other", "Other Catalogues"],
-          ] as const
-        ).map(([key, label]) => (
+      <div className="business-stats">
+        <div>
+          <Package size={22} />
+          <span>
+            <strong>{entries.length}</strong>
+            <small>Purchased products</small>
+          </span>
+        </div>
+        <div>
+          <Repeat size={22} />
+          <span>
+            <strong>{(orders.data || []).filter((o) => o.status === "delivered").length}</strong>
+            <small>Completed purchases</small>
+          </span>
+        </div>
+        <div>
+          <Store size={22} />
+          <span>
+            <strong>
+              {
+                distributorsWithDistance(location).filter(
+                  (d) => d.status === "active" && d.distanceKm <= radius
+                ).length
+              }
+            </strong>
+            <small>Suppliers within {radius} km</small>
+          </span>
+        </div>
+      </div>
+      <div className="business-tabs">
+        {[
+          ["mine", "Purchased"],
+          ["saved", "Saved products"],
+          ["nearby", "Nearby distributors"],
+          ["other", "Other catalogues"],
+          ["reorder", "Quick reorder"],
+        ].map(([id, label]) => (
           <button
-            key={key}
-            type="button"
-            onClick={() => setTab(key)}
-            className={
-              "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors " +
-              (tab === key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:bg-muted")
-            }
+            key={id}
+            className={tab === id ? "selected" : ""}
+            onClick={() => {
+              setQuery("");
+              void navigate({ search: { tab: id } });
+            }}
           >
             {label}
           </button>
         ))}
       </div>
-
-      {tab !== "mine" ? (
-        <DistributorPanel mode={tab} email={email} />
-      ) : catalogue.loading ? (
-        <p className="py-16 text-center text-sm text-muted-foreground">Loading your catalogue…</p>
-      ) : entries.length === 0 ? (
-        <div className="mt-10 rounded-2xl border border-dashed border-border p-12 text-center">
-          <PackageSearch className="mx-auto size-8 text-muted-foreground" />
-          <p className="mt-3 font-semibold text-foreground">Your catalogue is still empty</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Products you buy from BOXAIO appear here automatically once the order is delivered.
+      {tab === "nearby" || tab === "other" ? (
+        <>
+          <BusinessLocation />
+          <div className="business-toolbar">
+            <label className="business-search">
+              <Search size={16} />
+              <input
+                aria-label="Search catalogue distributors"
+                placeholder="Find a distributor or area"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <select
+              aria-label="Nearby radius"
+              value={radius}
+              onChange={(e) => setRadius(Number(e.target.value))}
+            >
+              {[5, 10, 25].map((n) => (
+                <option key={n} value={n}>
+                  Within {n} km
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="business-count">
+            {distributors.length}{" "}
+            {tab === "nearby" ? "nearby suppliers" : "suppliers outside your selected radius"}
           </p>
-          <Link to="/retailer/shop" className="mt-5 inline-block">
-            <Button>Start wholesale shopping</Button>
-          </Link>
+          <DistributorGrid
+            distributors={distributors}
+            from={tab === "nearby" ? "nearby" : "other"}
+          />
+        </>
+      ) : tab === "saved" ? (
+        <>
+          <div className="business-toolbar">
+            <label className="business-search">
+              <Search size={16} />
+              <input
+                aria-label="Search saved wholesale products"
+                placeholder="Search your saved products"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+          </div>
+          <div className="wholesale-grid">
+            {B2B_PRODUCTS.filter(
+              (p) =>
+                saved.has(p.id) &&
+                (p.name + " " + p.brand).toLowerCase().includes(query.toLowerCase())
+            ).map((p) => (
+              <RetailerProductCard key={p.id} product={p} />
+            ))}
+          </div>
+          {!saved.ids.length && (
+            <div className="empty-state">
+              <Package size={30} />
+              <h2>Build your restock list</h2>
+              <p>Tap Save on a product to keep it here for your next purchase.</p>
+              <Link to="/retailer/shop" className="solid-button">
+                Browse wholesale
+              </Link>
+            </div>
+          )}
+        </>
+      ) : tab === "reorder" ? (
+        <div className="wholesale-grid">
+          {(orders.data || [])
+            .filter((o) => o.status === "delivered")
+            .map((o) => (
+              <QuickReorder key={o.id} order={o} />
+            ))}
         </div>
       ) : (
         <>
-          {/* A. Frequently purchased */}
-          <section className="mt-10">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <Sparkles className="size-5 text-primary" /> Frequently Purchased
-            </h2>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Ranked by how often your business reorders them.
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {frequentlyPurchased(entries).slice(0, 4).map((e) => (
-                <RetailerCatalogueCard key={e.productId} entry={e} />
+          <div className="business-toolbar">
+            <label className="business-search">
+              <Search size={16} />
+              <input
+                aria-label="Search my catalogue"
+                placeholder="Search product, brand or SKU"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <select
+              aria-label="My catalogue category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="all">All categories</option>
+              {[...new Set(entries.map((e) => e.product.category))].map((c) => (
+                <option key={c}>{c}</option>
               ))}
-            </div>
-          </section>
-
-          {/* B. Recently purchased */}
-          <section className="mt-12">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <Clock className="size-5 text-primary" /> Recently Purchased
-            </h2>
-            <p className="mb-4 text-sm text-muted-foreground">From your latest delivered orders.</p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {recentlyPurchased(entries).slice(0, 4).map((e) => (
-                <RetailerCatalogueCard key={e.productId} entry={e} />
-              ))}
-            </div>
-          </section>
-
-          {/* Quick reorder */}
-          {deliveredOrders.length > 0 ? (
-            <section className="mt-12">
-              <h2 className="text-lg font-semibold text-foreground">Quick Reorder</h2>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Re-add a previous order to your bulk cart — availability, MOQ and current B2B prices
-                are re-checked automatically.
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {deliveredOrders.map((order) => (
-                  <QuickReorder key={order.id} order={order} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {/* C. All my products */}
-          <section className="mt-12">
-            <h2 className="text-lg font-semibold text-foreground">All My Products</h2>
-            <div className="mt-4 flex flex-col gap-3 lg:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search My Product Catalogue… (name, brand, category, SKU)"
-                  className="pl-9"
-                />
-              </div>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-              >
-                <option value="all">All categories</option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={availability}
-                onChange={(e) => setAvailability(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-              >
-                <option value="all">All availability</option>
-                <option value="in">In stock</option>
-                <option value="out">Out of stock</option>
-              </select>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm"
-              >
-                <option value="frequent">Sort: Most purchased</option>
-                <option value="recent">Sort: Recently purchased</option>
-                <option value="name">Sort: Name A–Z</option>
-                <option value="price_low">Sort: Price low to high</option>
-              </select>
-            </div>
-
-            <p className="mt-3 text-xs text-muted-foreground">
-              {filtered.length} of {entries.length} catalogue products
-            </p>
-
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            </select>
+            <select
+              aria-label="Sort my catalogue"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="recent">Recently purchased</option>
+              <option value="frequent">Most purchased</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </div>
+          <p className="business-count">
+            {filtered.length} products · Open a product to compare packs and suppliers. Purchase
+            history keeps the original price.
+          </p>
+          {catalogue.loading ? (
+            <p className="business-count">Loading your catalogue…</p>
+          ) : catalogue.error ? (
+            <p role="alert">{catalogue.error}</p>
+          ) : (
+            <div className="wholesale-grid">
               {filtered.map((e) => (
                 <RetailerCatalogueCard key={e.productId} entry={e} />
               ))}
             </div>
-          </section>
+          )}
+          {!catalogue.loading && !filtered.length && (
+            <div className="empty-state">
+              <Package size={35} />
+              <h2>
+                {entries.length
+                  ? "No products match"
+                  : "Your catalogue starts with your first purchase"}
+              </h2>
+              <p>Delivered wholesale orders automatically add products here.</p>
+              <Link to="/retailer/shop" className="solid-button">
+                Explore wholesale
+              </Link>
+            </div>
+          )}
         </>
       )}
-    </div>
-  );
-}
-
-/**
- * Nearby (within 5 KM of the retailer's saved location) and Other (authorised)
- * distributor catalogues. Kept strictly separate from "My Products", which is
- * only what this retailer has actually purchased.
- */
-function DistributorPanel({ mode, email }: { mode: "nearby" | "other"; email: string }) {
-  const [location, setLocation] = useState(() => readRetailerLocation(email));
-  const [search, setSearch] = useState("");
-
-  const useLocation = () => {
-    const loc = DEFAULT_RETAILER_LOCATION;
-    if (typeof navigator !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const next = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          saveRetailerLocation(email, next);
-          setLocation(next);
-        },
-        () => {
-          saveRetailerLocation(email, loc);
-          setLocation(loc);
-        },
-      );
-      return;
-    }
-    saveRetailerLocation(email, loc);
-    setLocation(loc);
-  };
-
-  const q = search.trim().toLowerCase();
-  const all = location ? distributorsWithDistance(location) : [];
-  const near = location ? nearbyDistributors(location, NEARBY_RADIUS_KM) : [];
-  const nearIds = new Set(near.map((d) => d.id));
-  const base = mode === "nearby" ? near : all.filter((d) => !nearIds.has(d.id));
-  const rows = base.filter(
-    (d) =>
-      d.status === "active" &&
-      (!q ||
-        d.name.toLowerCase().includes(q) ||
-        d.businessName.toLowerCase().includes(q) ||
-        d.area.toLowerCase().includes(q)),
-  );
-
-  if (!location) {
-    return (
-      <div className="mt-8 rounded-2xl border border-dashed border-border p-12 text-center">
-        <MapPin className="mx-auto size-8 text-muted-foreground" />
-        <p className="mt-3 font-semibold text-foreground">
-          Set your location to discover nearby distributors
-        </p>
-        <Button className="mt-5" onClick={useLocation}>
-          Set Location
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            {mode === "nearby"
-              ? `Nearby Distributors · Within ${NEARBY_RADIUS_KM} KM`
-              : "Other Catalogues"}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {mode === "nearby"
-              ? "Suppliers closest to your store, nearest first."
-              : "Authorised distributors outside your 5 KM radius."}
-          </p>
-        </div>
-        <div className="relative sm:w-72">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search distributor, business or area…"
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <DistributorGrid
-          distributors={rows}
-          from={mode}
-          empty={
-            <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-              {mode === "nearby"
-                ? `No distributors within ${NEARBY_RADIUS_KM} KM of your store yet.`
-                : "No other distributor catalogues match your search."}
-            </div>
-          }
-        />
-      </div>
     </div>
   );
 }

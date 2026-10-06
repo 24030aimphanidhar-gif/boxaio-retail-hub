@@ -1,3 +1,4 @@
+import {appStorage} from '@/api/storage';
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
@@ -12,7 +13,7 @@ export function useB2BWishlist() {
 
   const read = useCallback(() => {
     try {
-      const raw = localStorage.getItem(key);
+      const raw = appStorage.getItem(key);
       setIds(raw ? (JSON.parse(raw) as string[]) : []);
     } catch {
       setIds([]);
@@ -31,12 +32,12 @@ export function useB2BWishlist() {
       const next = ids.includes(productId)
         ? ids.filter((id) => id !== productId)
         : [...ids, productId];
-      localStorage.setItem(key, JSON.stringify(next));
+      appStorage.setItem(key, JSON.stringify(next));
       setIds(next);
       window.dispatchEvent(new Event(EVENT));
       return next.includes(productId);
     },
-    [ids, key],
+    [ids, key]
   );
 
   return { ids, toggle, has: (id: string) => ids.includes(id) };

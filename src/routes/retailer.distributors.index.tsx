@@ -1,109 +1,80 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Search, Store } from "lucide-react";
-import { useMemo, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { DistributorProductRow } from "@/components/retailer/DistributorProductRow";
-import { cn } from "@/lib/utils";
-import { DISTRIBUTORS, productsByDistributor } from "@/retailer/b2b/service";
-
-export const Route = createFileRoute("/retailer/distributors/")({
-  head: () => ({
-    meta: [
-      { title: "Shop by Distributor | BOXAIO Business" },
-      {
-        name: "description",
-        content:
-          "Compare wholesale offers from SAI TRADE, SGBL and RA AGRO — price, margin, free delivery and stock.",
-      },
-      { property: "og:title", content: "Shop by Distributor | BOXAIO Business" },
-      {
-        property: "og:description",
-        content: "Distributor-wise wholesale offers with margin, MRP and delivery estimates.",
-      },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: ShopByDistributor,
-});
-
-function ShopByDistributor() {
-  const [active, setActive] = useState<string>(DISTRIBUTORS[0]!.id);
+import { BusinessLocation } from "@/components/retailer/BusinessLocation";
+import { DistributorGrid } from "@/components/retailer/DistributorDirectory";
+import { distributorsWithDistance } from "@/retailer/b2b/distributors";
+import { useBusinessLocation } from "@/retailer/b2b/location";
+export const Route = createFileRoute("/retailer/distributors/")({ component: Distributors });
+function Distributors() {
+  const { location } = useBusinessLocation();
   const [query, setQuery] = useState("");
-  const [visible, setVisible] = useState(20);
-
-  const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return productsByDistributor(active).filter(
-      (p) =>
-        !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q),
-    );
-  }, [active, query]);
-
+  const [radius, setRadius] = useState("all");
+  const [sort, setSort] = useState("distance");
+  const [access, setAccess] = useState("all");
+  const rows = distributorsWithDistance(location)
+    .filter(
+      (d) =>
+        d.status === "active" &&
+        (radius === "all" || d.distanceKm <= Number(radius)) &&
+        (access === "all" || d.catalogueVisibility !== "restricted") &&
+        `${d.name} ${d.area}`.toLowerCase().includes(query.toLowerCase())
+    )
+    .sort((a, b) => (sort === "name" ? a.name.localeCompare(b.name) : a.distanceKm - b.distanceKm));
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Shop by Distributor</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Compare supplier offers — price, margin and delivery — before you buy in bulk.
-      </p>
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        {DISTRIBUTORS.map((d) => (
-          <button
-            key={d.id}
-            type="button"
-            onClick={() => {
-              setActive(d.id);
-              setVisible(20);
-            }}
-            className={cn(
-              "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-              active === d.id
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:bg-muted",
-            )}
-          >
-            <Store className="size-4" /> {d.name}
-          </button>
-        ))}
-      </div>
-
-      <div className="relative mt-4">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search this distributor's products…"
-          className="pl-9"
-        />
-      </div>
-
-      <p className="mt-3 text-xs text-muted-foreground">{rows.length} products supplied</p>
-
-      <div className="mt-3 space-y-3">
-        {rows.slice(0, visible).map((p) => (
-          <DistributorProductRow key={p.id} product={p} preferredDistributorId={active} />
-        ))}
-        {rows.length === 0 ? (
-          <Card className="p-8 text-center text-sm text-muted-foreground">
-            No products match your search for this distributor.
-          </Card>
-        ) : null}
-      </div>
-
-      {visible < rows.length ? (
-        <div className="mt-6 flex justify-center">
-          <Button variant="outline" onClick={() => setVisible((v) => v + 20)}>
-            Load more
-          </Button>
+    <div className="wrap business-page">
+      <div className="business-page-heading">
+        <div>
+          <span className="eyebrow">YOUR LOCAL SUPPLY NETWORK</span>
+          <h1>Find your next great supplier.</h1>
+          <p>Explore distributor catalogues, compare prices, and build a smarter bulk order.</p>
         </div>
-      ) : null}
+        <Link className="outline-button" to="/retailer/catalogue" search={{ tab: "mine" }}>
+          My catalogue
+        </Link>
+      </div>
+      <BusinessLocation />
+      <div className="business-toolbar">
+        <label className="business-search">
+          <Search size={16} />
+          <input
+            aria-label="Search distributors"
+            placeholder="Search distributor or area"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+        <select
+          aria-label="Distributor radius"
+          value={radius}
+          onChange={(e) => setRadius(e.target.value)}
+        >
+          <option value="all">All distances</option>
+          <option value="5">Within 5 km</option>
+          <option value="10">Within 10 km</option>
+          <option value="25">Within 25 km</option>
+        </select>
+        <select
+          aria-label="Catalogue access"
+          value={access}
+          onChange={(e) => setAccess(e.target.value)}
+        >
+          <option value="all">All access levels</option>
+          <option value="open">Available catalogues</option>
+        </select>
+        <select
+          aria-label="Sort distributors"
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
+          <option value="distance">Nearest first</option>
+          <option value="name">Name A–Z</option>
+        </select>
+      </div>
+      <p className="business-count">
+        {rows.length} distributors · Prices and availability are sample data
+      </p>
+      <DistributorGrid distributors={rows} from="browse" />
     </div>
   );
 }

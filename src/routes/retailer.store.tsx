@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PageHeader } from "@/retailer/components/ui-bits";
 import { saveStore } from "@/retailer/data/service";
 import { useRetailerSession } from "@/retailer/hooks";
@@ -35,16 +41,30 @@ function StoreProfile() {
 
   return (
     <div>
-      <PageHeader title="Store profile" description="Details customers see on your BOXAIO store page." />
+      <PageHeader
+        title="Store profile"
+        description="Details customers see on your BOXAIO store page."
+      />
       <form onSubmit={submit} className="grid gap-6 lg:grid-cols-2">
         <Card className="space-y-4 p-5">
           <h2 className="text-lg font-semibold">Business details</h2>
-          <Field label="Store name"><Input value={form.name} onChange={(e) => set("name", e.target.value)} /></Field>
-          <Field label="Owner name"><Input value={form.retailerName} onChange={(e) => set("retailerName", e.target.value)} /></Field>
-          <Field label="GST number"><Input value={form.gstNumber} onChange={(e) => set("gstNumber", e.target.value)} /></Field>
+          <Field label="Store name">
+            <Input value={form.name} onChange={(e) => set("name", e.target.value)} />
+          </Field>
+          <Field label="Owner name">
+            <Input
+              value={form.retailerName}
+              onChange={(e) => set("retailerName", e.target.value)}
+            />
+          </Field>
+          <Field label="GST number">
+            <Input value={form.gstNumber} onChange={(e) => set("gstNumber", e.target.value)} />
+          </Field>
           <Field label="Store status">
             <Select value={form.status} onValueChange={(v) => set("status", v as StoreStatus)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="OPEN">Open</SelectItem>
                 <SelectItem value="CLOSED">Closed</SelectItem>
@@ -56,13 +76,26 @@ function StoreProfile() {
 
         <Card className="space-y-4 p-5">
           <h2 className="text-lg font-semibold">Contact</h2>
-          <Field label="Phone"><Input value={form.phone} onChange={(e) => set("phone", e.target.value)} /></Field>
-          <Field label="Email"><Input value={form.email} onChange={(e) => set("email", e.target.value)} /></Field>
-          <Field label="Logo URL"><Input value={form.logoUrl ?? ""} onChange={(e) => set("logoUrl", e.target.value)} /></Field>
-          <Field label="Banner URL"><Input value={form.bannerUrl ?? ""} onChange={(e) => set("bannerUrl", e.target.value)} /></Field>
+          <Field label="Phone">
+            <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          </Field>
+          <Field label="Email">
+            <Input value={form.email} onChange={(e) => set("email", e.target.value)} />
+          </Field>
+          <Field label="Logo URL">
+            <Input value={form.logoUrl ?? ""} onChange={(e) => set("logoUrl", e.target.value)} />
+          </Field>
+          <Field label="Banner URL">
+            <Input
+              value={form.bannerUrl ?? ""}
+              onChange={(e) => set("bannerUrl", e.target.value)}
+            />
+          </Field>
         </Card>
 
-        <Button type="submit" className="lg:col-span-2 lg:w-48">Save profile</Button>
+        <Button type="submit" className="lg:col-span-2 lg:w-48">
+          Save profile
+        </Button>
       </form>
     </div>
   );

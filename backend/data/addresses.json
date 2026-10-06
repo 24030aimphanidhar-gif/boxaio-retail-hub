@@ -1,0 +1,18 @@
+[
+  {
+    "id": "demo-home",
+    "type": "Home",
+    "name": "Ananya Rao",
+    "phone": "9876543210",
+    "street": "24 MG Road",
+    "line2": "Apartment 2B",
+    "landmark": "Near the main market",
+    "city": "Vijayawada",
+    "state": "Andhra Pradesh",
+    "pincode": "520010",
+    "instructions": "Call on arrival.",
+    "lat": 16.5062,
+    "lng": 80.648,
+    "isDefault": true
+  }
+]

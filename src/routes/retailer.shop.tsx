@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
 import { B2B_BRANDS, B2B_CATEGORIES, B2B_PRODUCTS, DISTRIBUTORS } from "@/retailer/b2b/service";
 
 type ShopSearch = { category?: string; brand?: string; distributor?: string };
@@ -55,13 +55,12 @@ function RetailerShop() {
       (p) =>
         (category === "all" || p.category === category) &&
         (brand === "all" || p.brand === brand) &&
-        (distributor === "all" ||
-          p.offers.some((o) => o.distributorId === distributor)) &&
+        (distributor === "all" || p.offers.some((o) => o.distributorId === distributor)) &&
         (!q ||
           p.name.toLowerCase().includes(q) ||
           p.brand.toLowerCase().includes(q) ||
           p.sku.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q)),
+          p.category.toLowerCase().includes(q))
     );
     if (sort === "price_low") rows = [...rows].sort((a, b) => a.b2bPrice - b.b2bPrice);
     if (sort === "price_high") rows = [...rows].sort((a, b) => b.b2bPrice - a.b2bPrice);
@@ -70,13 +69,13 @@ function RetailerShop() {
   }, [query, category, brand, distributor, sort]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="wrap business-page">
       <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Wholesale Shop</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {results.length} products available at business pricing
       </p>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="wholesale-shop-filters">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -87,6 +86,7 @@ function RetailerShop() {
           />
         </div>
         <select
+          aria-label="Wholesale category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="h-10 rounded-md border border-border bg-background px-3 text-sm"
@@ -99,6 +99,7 @@ function RetailerShop() {
           ))}
         </select>
         <select
+          aria-label="Wholesale brand"
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
           className="h-10 rounded-md border border-border bg-background px-3 text-sm"
@@ -111,6 +112,7 @@ function RetailerShop() {
           ))}
         </select>
         <select
+          aria-label="Wholesale distributor"
           value={distributor}
           onChange={(e) => setDistributor(e.target.value)}
           className="h-10 rounded-md border border-border bg-background px-3 text-sm"
@@ -123,6 +125,7 @@ function RetailerShop() {
           ))}
         </select>
         <select
+          aria-label="Sort wholesale products"
           value={sort}
           onChange={(e) => setSort(e.target.value)}
           className="h-10 rounded-md border border-border bg-background px-3 text-sm"
@@ -134,9 +137,30 @@ function RetailerShop() {
         </select>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {!results.length && (
+        <div className="empty-state">
+          <h2>No products found</h2>
+          <p>Try another search, category or distributor.</p>
+          <button
+            className="outline-button"
+            onClick={() => {
+              setQuery("");
+              setCategory("all");
+              setBrand("all");
+              setDistributor("all");
+            }}
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
+      <div className="wholesale-grid">
         {results.slice(0, visible).map((p) => (
-          <RetailerProductCard key={p.id} product={p} />
+          <RetailerProductCard
+            key={p.id + distributor}
+            product={p}
+            preferredDistributorId={distributor === "all" ? undefined : distributor}
+          />
         ))}
       </div>
 

@@ -42,7 +42,11 @@ function Notifications() {
             <Card key={n.id} className={n.read ? "p-4" : "border-primary/40 bg-primary/5 p-4"}>
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold text-foreground">{n.title}</p>
-                <Pill tone={n.type.includes("stock") ? "warning" : n.type === "new_order" ? "info" : "muted"}>
+                <Pill
+                  tone={
+                    n.type.includes("stock") ? "warning" : n.type === "new_order" ? "info" : "muted"
+                  }
+                >
                   {n.type.replace(/_/g, " ")}
                 </Pill>
                 {!n.read ? <Pill tone="danger">new</Pill> : null}

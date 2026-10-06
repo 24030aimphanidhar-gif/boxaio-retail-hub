@@ -1,0 +1,649 @@
+.cx-page {
+  padding-top: 22px;
+  padding-bottom: 40px;
+  color: #173024;
+}
+.cx-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.cx-heading h1 {
+  font-size: 28px;
+  margin: 4px 0;
+  font-weight: 750;
+}
+.cx-heading p,
+.cx-muted {
+  font-size: 12px;
+  color: #637267;
+  line-height: 1.6;
+}
+.cx-demo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  background: #e7f1e9;
+  color: #16502b;
+}
+.cx-steps {
+  display: flex;
+  border: 1px solid #dbe5db;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  background: white;
+}
+.cx-steps button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 5px;
+  font-size: 12px;
+  color: #607067;
+}
+.cx-steps button span {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #eef3ee;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.cx-steps button.active {
+  background: #16502b;
+  color: white;
+}
+.cx-steps button.active span {
+  background: #d0aa3a;
+  color: #173024;
+}
+.cx-steps button.complete {
+  color: #16502b;
+  background: #edf5ed;
+}
+.cx-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.cx-panel {
+  padding: 22px;
+  background: white;
+  border: 1px solid #dfe6dd;
+  border-radius: 12px;
+  min-width: 0;
+}
+.cx-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.cx-panel h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+.cx-panel-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.cx-panel-title h2 {
+  margin: 0;
+}
+.cx-panel button,
+.cx-panel a {
+  font-size: 12px;
+}
+.cx-panel .solid-button,
+.cx-panel .outline-button {
+  min-height: 40px;
+  padding: 10px 16px;
+  display: inline-flex;
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+}
+.cx-panel .solid-button {
+  background: #16502b;
+  color: white;
+}
+.cx-panel .outline-button {
+  border: 1px solid #cddacc;
+  color: #16502b;
+  background: white;
+}
+.cx-panel button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cx-addresses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.cx-addresses article,
+.cx-options label {
+  border: 1px solid #dce4d9;
+  border-radius: 8px;
+  padding: 13px;
+}
+.cx-addresses article.selected,
+.cx-options label.selected {
+  border-color: #247a3e;
+  background: #f0f7ee;
+  box-shadow: inset 0 0 0 1px #247a3e;
+}
+.cx-addresses label,
+.cx-options label {
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  align-items: flex-start;
+}
+.cx-page input[type="radio"],
+.cx-page input[type="checkbox"] {
+  accent-color: #16502b;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.cx-addresses label > span,
+.cx-options label > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cx-addresses b {
+  font-size: 13px;
+}
+.cx-addresses em {
+  font-size: 10px;
+  padding: 3px 5px;
+  background: #e6eddf;
+  border-radius: 4px;
+  font-style: normal;
+  margin-left: 4px;
+}
+.cx-addresses small,
+.cx-options small {
+  color: #647261;
+  font-size: 11px;
+}
+.cx-inline-actions,
+.cx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.cx-inline-actions button {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: #24613b;
+  font-size: 11px;
+}
+.cx-text {
+  color: #226238;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cx-checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  margin: 18px 0;
+}
+.cx-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.cx-form-grid label,
+.cx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.cx-page input:not([type="radio"]):not([type="checkbox"]),
+.cx-page select,
+.cx-page textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #ccd8cc;
+  border-radius: 6px;
+  padding: 10px;
+  background: white;
+  color: #173024;
+  font-size: 13px;
+  min-height: 40px;
+}
+.cx-page input:focus,
+.cx-page select:focus,
+.cx-page textarea:focus {
+  outline: 2px solid #79a773;
+  outline-offset: 1px;
+}
+.cx-form-grid small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #647261;
+  line-height: 1.5;
+}
+.cx-field {
+  margin: 18px 0;
+  max-width: 320px;
+}
+.cx-note {
+  padding: 12px;
+  background: #f2f6ed;
+  border: 1px solid #dfe9d6;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cx-error {
+  padding: 12px;
+  background: #fff4ef;
+  border: 1px solid #edc4b2;
+  color: #9c3820;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 14px 0;
+}
+.cx-error ul {
+  list-style: disc;
+  padding-left: 18px;
+  margin-top: 5px;
+}
+.cx-options {
+  display: grid;
+  gap: 9px;
+}
+.cx-payment {
+  grid-template-columns: 1fr 1fr;
+}
+.cx-options b {
+  font-size: 13px;
+}
+.cx-coupon {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+.cx-offers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.cx-offers article {
+  border: 1px dashed #b4c6a6;
+  background: #fbfcf5;
+  border-radius: 7px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cx-offers b {
+  font-size: 12px;
+}
+.cx-offers small {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #647261;
+}
+.cx-offers button {
+  align-self: flex-start;
+}
+.cx-summary {
+  position: sticky;
+  top: 100px;
+}
+.cx-summary h2 {
+  justify-content: space-between;
+}
+.cx-summary h2 small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #647261;
+}
+.cx-totals {
+  margin: 8px 0;
+}
+.cx-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  padding: 7px 0;
+}
+.cx-totals dd {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cx-totals .cx-tax {
+  font-size: 10px;
+  color: #687464;
+  border-top: 1px dashed #dfe5d9;
+}
+.cx-totals .cx-total {
+  font-size: 18px;
+  font-weight: 750;
+  border-top: 1px solid #d5e2d1;
+  padding-top: 15px;
+  margin-top: 6px;
+}
+.cx-assurance {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #e3eadd;
+  padding-top: 14px;
+  margin: 14px 0;
+  font-size: 11px;
+  line-height: 1.9;
+  color: #34673c;
+}
+.cx-lines > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid #e4eadf;
+}
+.cx-lines img {
+  width: 62px;
+  height: 65px;
+  object-fit: contain;
+  background: #f6f7f0;
+  border-radius: 6px;
+}
+.cx-lines span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cx-lines b {
+  font-size: 13px;
+}
+.cx-lines small {
+  font-size: 11px;
+  color: #637160;
+}
+.cx-lines strong {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.cx-review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.cx-review-grid h3 {
+  display: flex;
+  justify-content: space-between;
+}
+.cx-review-grid button {
+  color: #26713b;
+  text-decoration: underline;
+}
+.cx-gateway {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 10px;
+}
+.cx-gateway h2 {
+  margin: 0;
+}
+.cx-gateway p {
+  max-width: 480px;
+  line-height: 1.7;
+  font-size: 13px;
+}
+.cx-gateway small {
+  font-size: 11px;
+  color: #647261;
+}
+.cx-gateway .cx-actions {
+  justify-content: center;
+}
+.cx-place {
+  width: 100%;
+  background: #d0aa3a !important;
+  color: #173024 !important;
+  font-weight: 750;
+}
+.cx-success {
+  background: #eef6eb;
+  border: 1px solid #cfdcc8;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.cx-success > svg {
+  margin: 0 auto 10px;
+  color: #26703b;
+}
+.cx-success h1 {
+  font-size: 26px;
+  font-weight: 750;
+  margin: 7px 0;
+}
+.cx-success p {
+  font-size: 13px;
+  color: #637160;
+}
+.cx-success-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 23px;
+  text-align: left;
+}
+.cx-success-meta div {
+  background: white;
+  padding: 12px;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cx-success-meta small {
+  font-size: 10px;
+  color: #637160;
+}
+.cx-success-meta b {
+  font-size: 12px;
+}
+.cx-address-form h3 {
+  margin-top: 0;
+}
+.cx-address-form .cx-actions {
+  margin-bottom: 12px;
+}
+@media (max-width: 1000px) {
+  .cx-layout {
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 12px;
+  }
+  .cx-panel {
+    padding: 16px;
+  }
+  .cx-addresses,
+  .cx-offers {
+    grid-template-columns: 1fr;
+  }
+  .cx-success-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 700px) {
+  .cx-page {
+    padding-top: 12px;
+    padding-bottom: 30px;
+  }
+  .cx-heading {
+    display: block;
+    margin-bottom: 12px;
+  }
+  .cx-heading h1 {
+    font-size: 23px;
+  }
+  .cx-heading p {
+    margin-bottom: 10px;
+  }
+  .cx-demo {
+    width: fit-content;
+    font-size: 10px;
+    padding: 6px 9px;
+  }
+  .cx-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cx-panel {
+    width: 100%;
+    padding: 14px;
+    border-radius: 9px;
+  }
+  .cx-summary {
+    position: static;
+  }
+  .cx-steps {
+    margin-bottom: 12px;
+  }
+  .cx-steps button {
+    flex-direction: column;
+    gap: 4px;
+    padding: 9px 2px;
+    font-size: 10px;
+  }
+  .cx-steps button span {
+    width: 21px;
+    height: 21px;
+  }
+  .cx-panel h2 {
+    font-size: 16px;
+  }
+  .cx-form-grid {
+    gap: 10px;
+  }
+  .cx-form-grid label {
+    font-size: 11px;
+  }
+  .cx-form-grid input {
+    font-size: 12px;
+  }
+  .cx-panel-title .outline-button {
+    padding: 8px;
+    min-height: 34px;
+    font-size: 10px;
+  }
+  .cx-payment {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .cx-payment label {
+    padding: 9px;
+    gap: 6px;
+  }
+  .cx-options b {
+    font-size: 12px;
+  }
+  .cx-options small {
+    font-size: 10px;
+  }
+  .cx-review-grid {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+  .cx-lines img {
+    width: 46px;
+    height: 55px;
+  }
+  .cx-lines > div {
+    gap: 8px;
+  }
+  .cx-lines b,
+  .cx-lines strong {
+    font-size: 12px;
+  }
+  .cx-lines small {
+    font-size: 10px;
+  }
+  .cx-success {
+    padding: 20px 12px;
+  }
+  .cx-success h1 {
+    font-size: 22px;
+  }
+  .cx-success-meta {
+    gap: 8px;
+  }
+  .cx-success-meta div {
+    padding: 9px;
+  }
+  .cx-success-meta b {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  .cx-actions .solid-button {
+    flex: 1;
+  }
+  .cx-totals .cx-total {
+    font-size: 19px;
+  }
+}
+@media (max-width: 360px) {
+  .cx-form-grid,
+  .cx-payment {
+    grid-template-columns: 1fr;
+  }
+  .cx-panel {
+    padding: 12px;
+  }
+  .cx-success-meta {
+    grid-template-columns: 1fr;
+  }
+  .cx-lines strong {
+    font-size: 11px;
+  }
+}

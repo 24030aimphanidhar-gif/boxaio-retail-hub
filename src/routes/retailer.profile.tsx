@@ -28,7 +28,10 @@ function RetailerProfile() {
     ["Email", user?.email ?? "—"],
     ["Phone", store?.phone ?? "—"],
     ["GST number", store?.gstNumber ?? "—"],
-    ["Address", store ? `${store.addressLine}, ${store.city}, ${store.state} ${store.pincode}` : "—"],
+    [
+      "Address",
+      store ? `${store.addressLine}, ${store.city}, ${store.state} ${store.pincode}` : "—",
+    ],
   ];
 
   return (

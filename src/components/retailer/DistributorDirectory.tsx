@@ -1,76 +1,81 @@
+import {appStorage} from '@/api/storage';
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Lock, MapPin, Store } from "lucide-react";
-import { toast } from "sonner";
-
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { ArrowUpRight, MapPin, Store, Lock } from "lucide-react";
 import { canViewCatalogue, productsByDistributor } from "@/retailer/b2b/service";
 import type { DistributorWithDistance } from "@/retailer/b2b/distributors";
-
-/**
- * Shared distributor card used by "Nearby Distributors" and "Other Catalogues".
- * Purely data-driven, so any number of distributors renders without new code.
- */
+import { useAuth } from "@/context/AuthContext";
 export function DistributorCard({
-  distributor,
+  distributor: d,
   from,
   showDistance = true,
 }: {
   distributor: DistributorWithDistance;
-  /** Where the retailer came from — powers contextual back navigation. */
   from: "nearby" | "other" | "browse";
   showDistance?: boolean;
 }) {
-  const count = productsByDistributor(distributor.id).length;
-  const allowed = canViewCatalogue(distributor);
-
+  const { user } = useAuth();
+  const key = "boxaio_access_" + user?.email + "_" + d.id;
+  const [requested, setRequested] = useState(() => appStorage.getItem(key) === "requested");
+  const allowed = canViewCatalogue(d);
+  const count = productsByDistributor(d.id).length;
   return (
-    <Card className="flex h-full flex-col gap-2 p-4">
-      <div className="flex items-center gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Store className="size-5" />
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-foreground">{distributor.businessName}</p>
-          <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-            <MapPin className="size-3" /> {distributor.area}
-            {showDistance ? ` · ${distributor.distanceKm.toFixed(1)} KM` : null}
-          </p>
-        </div>
+    <article className="distributor-card">
+      <div className="distributor-avatar">
+        <Store size={24} />
+        <span>{d.status === "active" ? "Active supplier" : "Offline"}</span>
       </div>
-
-      <p className="text-xs text-muted-foreground">{count} products</p>
-
+      <h3>{d.businessName}</h3>
+      <p>
+        <MapPin size={13} />
+        {d.area}
+        {showDistance ? " · " + d.distanceKm.toFixed(1) + " km" : ""}
+      </p>
+      <div className="distributor-facts">
+        <span>
+          <strong>{count}</strong> products
+        </span>
+        <span>
+          <strong>{d.serviceRadius} km</strong> service radius
+        </span>
+      </div>
+      <p className="distributor-coverage">
+        {d.distanceKm <= d.serviceRadius
+          ? "Within local delivery area"
+          : "Outside local delivery area · demo shipping available"}
+      </p>
       {allowed ? (
         <Link
+          className="outline-button"
           to="/retailer/distributors/$distributorId/catalogue"
-          params={{ distributorId: distributor.id }}
+          params={{ distributorId: d.id }}
           search={{ from }}
-          className="mt-auto"
         >
-          <Button size="sm" className="w-full">
-            View Catalogue
-          </Button>
+          View catalogue <ArrowUpRight size={15} />
         </Link>
       ) : (
-        <div className="mt-auto space-y-2">
-          <p className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Lock className="size-3" /> Catalogue access requires distributor approval.
+        <>
+          <p className="restricted-note">
+            <Lock size={12} />{" "}
+            {d.status === "inactive"
+              ? "Supplier is currently offline."
+              : "This catalogue requires approval."}
           </p>
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-full"
-            onClick={() => toast.success(`Access request sent to ${distributor.businessName}`)}
+          <button
+            disabled={requested || d.status === "inactive"}
+            className="outline-button"
+            onClick={() => {
+              appStorage.setItem(key, "requested");
+              setRequested(true);
+            }}
           >
-            Request Access
-          </Button>
-        </div>
+            {requested ? "Demo access request saved" : "Save demo access request"}
+          </button>
+        </>
       )}
-    </Card>
+    </article>
   );
 }
-
 export function DistributorGrid({
   distributors,
   from,
@@ -82,12 +87,21 @@ export function DistributorGrid({
   showDistance?: boolean;
   empty?: React.ReactNode;
 }) {
-  if (distributors.length === 0) return <>{empty}</>;
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  return distributors.length ? (
+    <div className="distributor-grid">
       {distributors.map((d) => (
         <DistributorCard key={d.id} distributor={d} from={from} showDistance={showDistance} />
       ))}
     </div>
+  ) : (
+    <>
+      {empty || (
+        <div className="empty-state">
+          <MapPin size={30} />
+          <h2>No suppliers match</h2>
+          <p>Try another area, a wider radius, or all distributors.</p>
+        </div>
+      )}
+    </>
   );
 }

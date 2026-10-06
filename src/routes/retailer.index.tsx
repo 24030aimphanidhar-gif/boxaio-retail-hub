@@ -8,9 +8,9 @@ import {
   ShopByCategoryRail,
   ShopByDistributorRail,
 } from "@/components/retailer/BrowseRails";
-import { QuickReorder } from "@/components/retailer/QuickReorder";
-import { RetailerCatalogueCard } from "@/components/retailer/RetailerCatalogueCard";
-import { RetailerProductCard } from "@/components/retailer/RetailerProductCard";
+import { QuickReorder } from "@/features/wholesale/components/QuickReorder";
+import { RetailerCatalogueCard } from "@/features/wholesale/components/RetailerCatalogueCard";
+import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
 import {
   B2B_PRODUCTS,
   fetchMyCatalogue,
@@ -57,7 +57,7 @@ function RetailerStorefrontHome() {
           <Link to="/retailer/shop">
             <Button>Shop wholesale</Button>
           </Link>
-          <Link to="/retailer/catalogue">
+          <Link to="/retailer/catalogue" search={{ tab: "mine" }}>
             <Button variant="outline">My Product Catalogue</Button>
           </Link>
         </div>
@@ -67,7 +67,11 @@ function RetailerStorefrontHome() {
         {[
           { icon: Percent, title: "Bulk discounts", text: "Automatic savings on large orders" },
           { icon: Truck, title: "Free bulk delivery", text: "On orders above ₹5,000" },
-          { icon: PackageSearch, title: "Auto catalogue", text: "Purchases saved for fast reorder" },
+          {
+            icon: PackageSearch,
+            title: "Auto catalogue",
+            text: "Purchases saved for fast reorder",
+          },
         ].map((f) => (
           <Card key={f.title} className="flex items-start gap-3 p-4">
             <f.icon className="mt-0.5 size-5 text-primary" />
@@ -98,6 +102,7 @@ function RetailerStorefrontHome() {
             <h2 className="text-lg font-semibold text-foreground">Buy again</h2>
             <Link
               to="/retailer/catalogue"
+              search={{ tab: "mine" }}
               className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
             >
               My Product Catalogue <ArrowRight className="size-3.5" />

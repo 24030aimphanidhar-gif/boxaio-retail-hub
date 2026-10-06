@@ -5,7 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { EmptyState, LoadingRows, OrderStatusBadge, PageHeader, Pill } from "@/retailer/components/ui-bits";
+import {
+  EmptyState,
+  LoadingRows,
+  OrderStatusBadge,
+  PageHeader,
+  Pill,
+} from "@/retailer/components/ui-bits";
 import { fetchOrder, updateOrderStatus } from "@/retailer/data/service";
 import { formatCurrency, formatDate, useAsync, useRetailerSession } from "@/retailer/hooks";
 import { ORDER_STATUS_LABELS, ORDER_TRANSITIONS, type OrderStatus } from "@/retailer/types";
@@ -14,12 +20,23 @@ export const Route = createFileRoute("/retailer/orders/$orderId")({
   component: RetailerOrderDetail,
 });
 
-const TIMELINE: OrderStatus[] = ["placed", "accepted", "preparing", "ready", "picked_up", "delivered"];
+const TIMELINE: OrderStatus[] = [
+  "placed",
+  "accepted",
+  "preparing",
+  "ready",
+  "picked_up",
+  "delivered",
+];
 
 function RetailerOrderDetail() {
   const { orderId } = useParams({ from: "/retailer/orders/$orderId" });
   const { storeId } = useRetailerSession();
-  const { data: order, loading, reload } = useAsync(() => fetchOrder(storeId, orderId), [storeId, orderId]);
+  const {
+    data: order,
+    loading,
+    reload,
+  } = useAsync(() => fetchOrder(storeId, orderId), [storeId, orderId]);
 
   const advance = async (next: OrderStatus) => {
     try {
@@ -100,7 +117,11 @@ function RetailerOrderDetail() {
                     >
                       {i + 1}
                     </span>
-                    <span className={i <= activeIndex ? "text-sm font-medium" : "text-sm text-muted-foreground"}>
+                    <span
+                      className={
+                        i <= activeIndex ? "text-sm font-medium" : "text-sm text-muted-foreground"
+                      }
+                    >
                       {ORDER_STATUS_LABELS[step]}
                     </span>
                   </li>
@@ -155,7 +176,15 @@ function RetailerOrderDetail() {
             <h2 className="mb-3 text-lg font-semibold">Payment</h2>
             <div className="flex flex-wrap gap-2">
               <Pill tone="info">{order.paymentMethod}</Pill>
-              <Pill tone={order.paymentStatus === "paid" ? "success" : order.paymentStatus === "refunded" ? "danger" : "warning"}>
+              <Pill
+                tone={
+                  order.paymentStatus === "paid"
+                    ? "success"
+                    : order.paymentStatus === "refunded"
+                      ? "danger"
+                      : "warning"
+                }
+              >
                 {order.paymentStatus}
               </Pill>
             </div>

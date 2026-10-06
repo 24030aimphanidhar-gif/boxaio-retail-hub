@@ -1,3 +1,4 @@
+import { appPath } from "@/lib/paths";
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { useRetailerSession } from "@/retailer/hooks";
 
 /** Paths that render the B2B storefront chrome instead of the store dashboard. */
 const STOREFRONT_PATHS = [
+  "/retailer/item",
   "/retailer/shop",
   "/retailer/business-categories",
   "/retailer/distributors",
@@ -44,7 +46,8 @@ export const Route = createFileRoute("/retailer")({
 
 function RetailerLayout() {
   const { ready, isRetailer, isAdmin, store, user } = useRetailerSession();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = appPath(rawPathname);
   const isStorefront =
     pathname === "/retailer" || STOREFRONT_PATHS.some((p) => pathname.startsWith(p));
 
