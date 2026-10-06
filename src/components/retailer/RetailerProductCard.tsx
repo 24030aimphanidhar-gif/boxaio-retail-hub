@@ -47,8 +47,13 @@ export function RetailerProductCard({
 
   return (
     <Card className="flex h-full flex-col overflow-hidden rounded-2xl border-border bg-card transition-shadow hover:shadow-lg">
-      {/* Top: horizontal image + info */}
-      <div className="flex">
+      {/* Top: horizontal image + info (clicking opens the product overview) */}
+      <Link
+        to="/retailer/product/$productId"
+        params={{ productId: product.id }}
+        className="flex"
+        aria-label={`View ${product.name}`}
+      >
         <div className="relative w-[42%] shrink-0 overflow-hidden sm:w-[45%]">
           <img
             src={product.image}
