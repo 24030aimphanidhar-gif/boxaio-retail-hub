@@ -18,6 +18,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -111,6 +112,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const EditProfileRoute = EditProfileRouteImport.update({
   id: '/edit-profile',
   path: '/edit-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -373,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/edit-profile': typeof EditProfileRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/edit-profile': typeof EditProfileRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/edit-profile': typeof EditProfileRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
@@ -555,6 +564,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/edit-profile'
+    | '/home'
     | '/login'
     | '/offers'
     | '/privacy'
@@ -615,6 +625,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/edit-profile'
+    | '/home'
     | '/login'
     | '/offers'
     | '/privacy'
@@ -674,6 +685,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/edit-profile'
+    | '/home'
     | '/login'
     | '/offers'
     | '/privacy'
@@ -735,6 +747,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   EditProfileRoute: typeof EditProfileRoute
+  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   OffersRoute: typeof OffersRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -817,6 +830,13 @@ declare module '@tanstack/react-router' {
       path: '/edit-profile'
       fullPath: '/edit-profile'
       preLoaderRoute: typeof EditProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -1250,6 +1270,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   EditProfileRoute: EditProfileRoute,
+  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   OffersRoute: OffersRoute,
   PrivacyRoute: PrivacyRoute,
