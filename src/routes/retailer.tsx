@@ -73,7 +73,7 @@ function RetailerLayout() {
             <Link to="/login">
               <Button>Sign in</Button>
             </Link>
-            <Link to="/">
+            <Link to="/home">
               <Button variant="outline">Back to store</Button>
             </Link>
           </div>
