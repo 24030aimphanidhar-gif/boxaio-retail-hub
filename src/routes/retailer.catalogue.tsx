@@ -2,7 +2,13 @@ import { useSavedWholesale } from "@/features/wholesale/useSavedWholesale";
 import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
 import { B2B_PRODUCTS } from "@/retailer/b2b/service";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { LayoutGrid, List, ShoppingCart } from "lucide-react";
+import { CatalogueSelectionContext } from "@/features/wholesale/selection";
+import { useB2BCart } from "@/retailer/b2b/CartContext";
+import { availableOffers, quoteProduct } from "@/retailer/b2b/pricing";
+import { money } from "@/lib/demo-orders";
 import { Download, Search, Package, Store, Repeat } from "lucide-react";
 import { RetailerCatalogueCard } from "@/features/wholesale/components/RetailerCatalogueCard";
 import { DistributorGrid } from "@/components/retailer/DistributorDirectory";
@@ -30,6 +36,11 @@ function MyCatalogue() {
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("recent");
   const [radius, setRadius] = useState(5);
+  const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [picked, setPicked] = useState<Record<string, { distributorId: string; variantId: string }>>({});
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const busy = useRef(false);
+  const cart = useB2BCart();
   const entries = catalogue.data || [];
   const filtered = entries
     .filter(
@@ -46,6 +57,73 @@ function MyCatalogue() {
           ? a.product.name.localeCompare(b.product.name)
           : +new Date(b.lastPurchasedAt) - +new Date(a.lastPurchasedAt)
     );
+  const lineFor = (id: string) => {
+    const e = entries.find((x) => x.productId === id);
+    const pick = picked[id];
+    if (!e || !pick) return null;
+    const offer = availableOffers(e.product).find((o) => o.distributorId === pick.distributorId);
+    if (!offer) return { e, offer, q: null, qty: 0 };
+    const base = quoteProduct(e.product, offer, pick.variantId);
+    const qty = qtys[id] ?? base.variant.moq;
+    return { e, offer, qty, q: quoteProduct(e.product, offer, pick.variantId, qty) };
+  };
+  const visiblePicked = filtered.filter((e) => picked[e.productId]);
+  const selectedTotal = visiblePicked.reduce((s, e) => {
+    const l = lineFor(e.productId);
+    return s + (l?.q ? l.q.unitPrice * l.qty : 0);
+  }, 0);
+  const selectable = filtered
+    .map((e) => {
+      const offers = availableOffers(e.product);
+      const o =
+        offers.find((x) => x.distributorId === e.lastDistributorId) ||
+        [...offers].sort((a, b) => a.price - b.price)[0];
+      return o ? { id: e.productId, distributorId: o.distributorId, variantId: e.lastVariantId || "standard" } : null;
+    })
+    .filter((x): x is { id: string; distributorId: string; variantId: string } => !!x);
+  const allSelected = selectable.length > 0 && selectable.every((x) => picked[x.id]);
+  function toggleAll() {
+    setPicked((prev) => {
+      const next = { ...prev };
+      for (const x of selectable) {
+        if (allSelected) delete next[x.id];
+        else next[x.id] = { distributorId: x.distributorId, variantId: x.variantId };
+      }
+      return next;
+    });
+  }
+  function addSelected() {
+    if (busy.current) return;
+    if (!visiblePicked.length) return toast.info("Select products to add to your cart");
+    busy.current = true;
+    try {
+      const lines = visiblePicked.map((e) => lineFor(e.productId)!);
+      const pre = lines.filter((l) => !l.offer || !l.q || l.q.error);
+      const { added, failed } = cart.addManyToCart(
+        lines
+          .filter((l) => l.offer && l.q && !l.q.error)
+          .map((l) => ({ product: l.e.product, qty: l.qty, offer: l.offer, variantId: picked[l.e.productId].variantId }))
+      );
+      const problems = [
+        ...pre.map((l) => ({ name: l.e.product.name, reason: l.q?.error || "Supplier unavailable" })),
+        ...failed,
+      ];
+      if (added.length) {
+        toast.success(`${added.length} product${added.length > 1 ? "s" : ""} added to cart`);
+        setPicked((prev) => {
+          const next = { ...prev };
+          added.forEach((id) => delete next[id]);
+          return next;
+        });
+      }
+      if (problems.length)
+        toast.error(`${problems.length} not added — still selected`, {
+          description: problems.map((p) => `${p.name}: ${p.reason}`).join("\n"),
+        });
+    } finally {
+      setTimeout(() => (busy.current = false), 400);
+    }
+  }
   const distributors = distributorsWithDistance(location).filter(
     (d) =>
       d.status === "active" &&
@@ -243,6 +321,14 @@ function MyCatalogue() {
               <option value="frequent">Most purchased</option>
               <option value="name">Name A–Z</option>
             </select>
+            <div className="view-toggle" role="group" aria-label="Catalogue view">
+              <button aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>
+                <LayoutGrid size={15} /> Grid
+              </button>
+              <button aria-pressed={layout === "list"} onClick={() => setLayout("list")}>
+                <List size={15} /> List
+              </button>
+            </div>
           </div>
           <p className="business-count">
             {filtered.length} products · Open a product to compare packs and suppliers. Purchase
@@ -253,11 +339,59 @@ function MyCatalogue() {
           ) : catalogue.error ? (
             <p role="alert">{catalogue.error}</p>
           ) : (
-            <div className="wholesale-grid">
-              {filtered.map((e) => (
-                <RetailerCatalogueCard key={e.productId} entry={e} />
-              ))}
-            </div>
+            <CatalogueSelectionContext.Provider
+              value={{
+                layout,
+                isSelected: (id) => !!picked[id],
+                toggle: (id, distributorId, variantId) =>
+                  setPicked((prev) => {
+                    const next = { ...prev };
+                    if (next[id]) delete next[id];
+                    else next[id] = { distributorId, variantId };
+                    return next;
+                  }),
+                qty: (id) => qtys[id],
+                setQty: (id, v) => setQtys((prev) => ({ ...prev, [id]: v })),
+              }}
+            >
+              {filtered.length > 0 && (
+                <div className="selection-bar" role="region" aria-label="Selected products">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all displayed products"
+                    />
+                    Select all ({selectable.length})
+                  </label>
+                  <span className="sel-summary" aria-live="polite">
+                    {visiblePicked.length} selected · <strong>{money(selectedTotal)}</strong>
+                  </span>
+                  <div className="sel-actions">
+                    <button
+                      className="outline-button"
+                      disabled={!visiblePicked.length}
+                      onClick={() => setPicked({})}
+                    >
+                      Clear selection
+                    </button>
+                    <button
+                      className="solid-button"
+                      disabled={!visiblePicked.length}
+                      onClick={addSelected}
+                    >
+                      <ShoppingCart size={15} /> Add Selected to Cart
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className={"wholesale-grid" + (layout === "list" ? " list-view" : "")}>
+                {filtered.map((e) => (
+                  <RetailerCatalogueCard key={e.productId} entry={e} />
+                ))}
+              </div>
+            </CatalogueSelectionContext.Provider>
           )}
           {!catalogue.loading && !filtered.length && (
             <div className="empty-state">
