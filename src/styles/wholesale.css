@@ -853,7 +853,7 @@
 .selection-bar .sel-summary { font-size: 13px; color: #2b4a2a; }
 .selection-bar .sel-actions { display: flex; gap: 8px; }
 .selection-bar input, .card-select input { width: 18px; height: 18px; accent-color: #2f7d32; cursor: pointer; }
-.card-select { position: absolute; top: 8px; left: 8px; z-index: 3; background: #fff; border-radius: 6px; padding: 4px; display: flex; box-shadow: 0 1px 4px #0002; }
+.card-select { position: absolute; bottom: 8px; left: 8px; z-index: 3; background: #fff; border-radius: 6px; padding: 4px; display: flex; box-shadow: 0 1px 4px #0002; }
 .retail-product-card.is-selected { outline: 2px solid #2f7d32; outline-offset: -2px; }
 .market-line-total { margin-left: 8px; font-style: normal; font-size: 12px; color: #2f7d32; font-weight: 600; }
 .wholesale-grid.list-view { grid-template-columns: 1fr; gap: 12px; }
