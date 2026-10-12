@@ -143,6 +143,42 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
     if (!line) return false;
     return checked([...current.current.filter((i) => i.key !== id), line]);
   }
+  /** Adds several lines in one commit; invalid lines are reported, never silently dropped. */
+  function addManyToCart(lines: BulkLine[]) {
+    let rows = [...current.current];
+    const added: string[] = [];
+    const failed: { name: string; reason: string }[] = [];
+    for (const l of lines) {
+      const supplier = l.offer || availableOffers(l.product)[0];
+      if (!supplier) {
+        failed.push({ name: l.product.name, reason: "No available supplier" });
+        continue;
+      }
+      const variantId = l.variantId || "standard";
+      const id = `${l.product.id}::${supplier.distributorId}::${variantId}`;
+      const old = rows.find((i) => i.key === id);
+      const line = materialize({
+        productId: l.product.id,
+        quantity: (old?.quantity || 0) + l.qty,
+        distributorId: supplier.distributorId,
+        variantId,
+      });
+      if (!line || line.error) {
+        failed.push({ name: l.product.name, reason: line?.error || "Unavailable" });
+        continue;
+      }
+      const next = [...rows.filter((i) => i.key !== id), line];
+      try {
+        validateCombinedStock(next.map(orderItem), getB2BProduct);
+        rows = next;
+        added.push(l.product.id);
+      } catch (e) {
+        failed.push({ name: l.product.name, reason: e instanceof Error ? e.message : "Invalid" });
+      }
+    }
+    if (added.length && !commit(rows)) return { added: [] as string[], failed };
+    return { added, failed };
+  }
   function setQuantity(id: string, qty: number) {
     const rows = current.current.map((i) =>
       i.key === id ? materialize({ ...i, quantity: qty })! : i
