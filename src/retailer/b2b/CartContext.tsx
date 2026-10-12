@@ -25,7 +25,14 @@ export interface B2BCartItem {
   discountPct: number;
   error: string;
 }
+export interface BulkLine {
+  product: B2BProduct;
+  qty: number;
+  offer?: DistributorOffer;
+  variantId?: string;
+}
 interface CartContext {
+  addManyToCart: (lines: BulkLine[]) => { added: string[]; failed: { name: string; reason: string }[] };
   items: B2BCartItem[];
   addBulkToCart: (
     p: B2BProduct,
@@ -191,6 +198,7 @@ export function B2BCartProvider({ children }: { children: ReactNode }) {
       value={{
         items,
         addBulkToCart,
+        addManyToCart,
         setQuantity,
         removeItem: (id) => {
           commit(current.current.filter((i) => i.key !== id));

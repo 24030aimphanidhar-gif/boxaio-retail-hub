@@ -843,3 +843,26 @@
     gap: 12px;
   }
 }
+
+/* Catalogue grid/list toggle + multi-select */
+.view-toggle { display: inline-flex; border: 1px solid #e0e8d6; border-radius: 10px; overflow: hidden; }
+.view-toggle button { padding: 8px 12px; display: inline-flex; gap: 6px; align-items: center; font-size: 13px; background: #fff; color: #2b4a2a; }
+.view-toggle button[aria-pressed="true"] { background: #2f7d32; color: #fff; }
+.selection-bar { position: sticky; top: 70px; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; background: #f3f8ee; border: 1px solid #cfe2c1; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; }
+.selection-bar label { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
+.selection-bar .sel-summary { font-size: 13px; color: #2b4a2a; }
+.selection-bar .sel-actions { display: flex; gap: 8px; }
+.selection-bar input, .card-select input { width: 18px; height: 18px; accent-color: #2f7d32; cursor: pointer; }
+.card-select { position: absolute; top: 8px; left: 8px; z-index: 3; background: #fff; border-radius: 6px; padding: 4px; display: flex; box-shadow: 0 1px 4px #0002; }
+.retail-product-card.is-selected { outline: 2px solid #2f7d32; outline-offset: -2px; }
+.market-line-total { margin-left: 8px; font-style: normal; font-size: 12px; color: #2f7d32; font-weight: 600; }
+.wholesale-grid.list-view { grid-template-columns: 1fr; gap: 12px; }
+.retail-product-card.list-layout { flex-direction: row; align-items: stretch; }
+.retail-product-card.list-layout:hover { transform: none; }
+.retail-product-card.list-layout .retail-card-photo { width: 170px; flex: 0 0 170px; height: auto; min-height: 150px; margin: 10px; }
+.retail-product-card.list-layout .retail-card-body { flex: 1; min-width: 0; }
+@media (max-width: 640px) {
+  .selection-bar { flex-direction: column; align-items: stretch; top: 60px; }
+  .selection-bar .sel-actions { flex-direction: column; }
+  .retail-product-card.list-layout .retail-card-photo { width: 110px; flex-basis: 110px; min-height: 110px; }
+}
