@@ -11,6 +11,7 @@ import { products } from "@/data/products";
 import { money } from "@/lib/demo-orders";
 import { ProductImage } from "@/features/shared/components/ProductImage";
 import { useSavedWholesale } from "@/features/wholesale/useSavedWholesale";
+import { useCatalogueSelection } from "@/features/wholesale/selection";
 export function StockPill({ stock }: { stock: number }) {
   return (
     <span className={"supply-stock " + (!stock ? "empty" : "")}>
@@ -42,7 +43,11 @@ export function RetailerProductCard({
     sorted.find((o) => !quoteProduct(p, o, initialVariantId).error) ||
     sorted[0];
   const base = offer ? quoteProduct(p, offer, initialVariantId) : null;
-  const [qty, setQty] = useState(base?.variant.moq || p.moq);
+  const sel = useCatalogueSelection();
+  const [localQty, setLocalQty] = useState(base?.variant.moq || p.moq);
+  const qty = sel?.qty(p.id) ?? localQty;
+  const setQty = (v: number) => (sel ? sel.setQty(p.id, v) : setLocalQty(v));
+  const selected = !!sel?.isSelected(p.id);
   const q = offer ? quoteProduct(p, offer, initialVariantId, qty) : null;
   const original = products.find((x) => x._id === p.id);
   const search = {
@@ -58,8 +63,26 @@ export function RetailerProductCard({
     }
   }
   return (
-    <article className="retail-product-card market-card" data-testid={"wholesale-" + p.id}>
+    <article
+      className={
+        "retail-product-card market-card" +
+        (sel?.layout === "list" ? " list-layout" : "") +
+        (selected ? " is-selected" : "")
+      }
+      data-testid={"wholesale-" + p.id}
+    >
       <div className="retail-card-photo">
+        {sel && (
+          <label className="card-select">
+            <input
+              type="checkbox"
+              checked={selected}
+              disabled={!offer}
+              aria-label={"Select " + p.name}
+              onChange={() => offer && sel.toggle(p.id, offer.distributorId, initialVariantId)}
+            />
+          </label>
+        )}
         <Link
           to="/retailer/item/$productId"
           params={{ productId: p.id }}
@@ -97,6 +120,7 @@ export function RetailerProductCard({
         <div className="market-price">
           <strong>{q ? money(q.unitPrice) : "Unavailable"}</strong>
           <small>/ pack</small>
+          {sel && q && <em className="market-line-total">{money(q.unitPrice * qty)} total</em>}
         </div>
         <div className="market-quantity">
           <span>Min {base?.variant.moq || p.moq}</span>
