@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { LayoutGrid, List, Search, ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
+import { CatalogueSelectionContext } from "@/features/wholesale/selection";
+import { useB2BCart } from "@/retailer/b2b/CartContext";
+import { availableOffers, quoteProduct } from "@/retailer/b2b/pricing";
+import { money } from "@/lib/demo-orders";
 import { B2B_BRANDS, B2B_CATEGORIES, B2B_PRODUCTS, DISTRIBUTORS } from "@/retailer/b2b/service";
 
 type ShopSearch = { category?: string; brand?: string; distributor?: string };
