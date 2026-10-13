@@ -78,6 +78,82 @@ function RetailerShop() {
     return rows;
   }, [query, category, brand, distributor, sort]);
 
+  const shown = results.slice(0, visible);
+  const bestOffer = (id: string) => {
+    const p = B2B_PRODUCTS.find((x) => x.id === id);
+    if (!p) return null;
+    const offers = availableOffers(p);
+    return (
+      offers.find((o) => o.distributorId === (distributor === "all" ? "" : distributor)) ||
+      [...offers].sort((a, b) => a.price - b.price)[0] ||
+      null
+    );
+  };
+  const lineFor = (id: string) => {
+    const p = B2B_PRODUCTS.find((x) => x.id === id);
+    const pick = picked[id];
+    if (!p || !pick) return null;
+    const offer = availableOffers(p).find((o) => o.distributorId === pick.distributorId);
+    if (!offer) return { p, offer, qty: 0, q: null };
+    const base = quoteProduct(p, offer, pick.variantId);
+    const qty = qtys[id] ?? base.variant.moq;
+    return { p, offer, qty, q: quoteProduct(p, offer, pick.variantId, qty) };
+  };
+  const visiblePicked = shown.filter((p) => picked[p.id]);
+  const selectedTotal = visiblePicked.reduce((s, p) => {
+    const l = lineFor(p.id);
+    return s + (l?.q ? l.q.unitPrice * l.qty : 0);
+  }, 0);
+  const selectable = shown
+    .map((p) => {
+      const o = bestOffer(p.id);
+      return o ? { id: p.id, distributorId: o.distributorId, variantId: "standard" } : null;
+    })
+    .filter((x): x is { id: string; distributorId: string; variantId: string } => !!x);
+  const allSelected = selectable.length > 0 && selectable.every((x) => picked[x.id]);
+  function toggleAll() {
+    setPicked((prev) => {
+      const next = { ...prev };
+      for (const x of selectable) {
+        if (allSelected) delete next[x.id];
+        else next[x.id] = { distributorId: x.distributorId, variantId: x.variantId };
+      }
+      return next;
+    });
+  }
+  function addSelected() {
+    if (busy.current) return;
+    if (!visiblePicked.length) return toast.info("Select products to add to your cart");
+    busy.current = true;
+    try {
+      const lines = visiblePicked.map((p) => lineFor(p.id)!);
+      const pre = lines.filter((l) => !l.offer || !l.q || l.q.error);
+      const { added, failed } = cart.addManyToCart(
+        lines
+          .filter((l) => l.offer && l.q && !l.q.error)
+          .map((l) => ({ product: l.p, qty: l.qty, offer: l.offer, variantId: picked[l.p.id].variantId }))
+      );
+      const problems = [
+        ...pre.map((l) => ({ name: l.p.name, reason: l.q?.error || "Supplier unavailable" })),
+        ...failed,
+      ];
+      if (added.length) {
+        toast.success(`${added.length} product${added.length > 1 ? "s" : ""} added to cart`);
+        setPicked((prev) => {
+          const next = { ...prev };
+          added.forEach((id) => delete next[id]);
+          return next;
+        });
+      }
+      if (problems.length)
+        toast.error(`${problems.length} not added — still selected`, {
+          description: problems.map((p) => `${p.name}: ${p.reason}`).join("\n"),
+        });
+    } finally {
+      setTimeout(() => (busy.current = false), 400);
+    }
+  }
+
   return (
     <div className="wrap business-page">
       <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Wholesale Shop</h1>
