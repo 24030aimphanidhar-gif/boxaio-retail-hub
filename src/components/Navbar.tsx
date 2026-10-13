@@ -34,6 +34,7 @@ export function Navbar() {
     ["Offers & savings", "/offers"],
     ["My orders", "/orders"],
     ["My catalogue", "/saved-lists"],
+    ["Wholesale", "/retailer/shop"],
   ];
   function business() {
     login("retailer@boxaio.com");
