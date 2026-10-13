@@ -221,6 +221,14 @@ function RetailerShop() {
           <option value="price_high">Price: High to Low</option>
           <option value="moq">Lowest MOQ</option>
         </select>
+        <div className="view-toggle" role="group" aria-label="Shop view">
+          <button aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>
+            <LayoutGrid size={15} /> Grid
+          </button>
+          <button aria-pressed={layout === "list"} onClick={() => setLayout("list")}>
+            <List size={15} /> List
+          </button>
+        </div>
       </div>
 
       {!results.length && (
