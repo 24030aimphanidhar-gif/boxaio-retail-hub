@@ -46,6 +46,11 @@ function RetailerShop() {
   const [distributor, setDistributor] = useState(search.distributor ?? "all");
   const [sort, setSort] = useState("relevance");
   const [visible, setVisible] = useState(24);
+  const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [picked, setPicked] = useState<Record<string, { distributorId: string; variantId: string }>>({});
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const busy = useRef(false);
+  const cart = useB2BCart();
 
   useEffect(() => {
     setCategory(search.category ?? "all");
