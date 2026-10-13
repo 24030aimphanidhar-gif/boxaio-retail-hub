@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { LayoutGrid, List, Search, ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RetailerProductCard } from "@/features/wholesale/components/RetailerProductCard";
+import { CatalogueSelectionContext } from "@/features/wholesale/selection";
+import { useB2BCart } from "@/retailer/b2b/CartContext";
+import { availableOffers, quoteProduct } from "@/retailer/b2b/pricing";
+import { money } from "@/lib/demo-orders";
 import { B2B_BRANDS, B2B_CATEGORIES, B2B_PRODUCTS, DISTRIBUTORS } from "@/retailer/b2b/service";
 
 type ShopSearch = { category?: string; brand?: string; distributor?: string };
@@ -41,6 +46,11 @@ function RetailerShop() {
   const [distributor, setDistributor] = useState(search.distributor ?? "all");
   const [sort, setSort] = useState("relevance");
   const [visible, setVisible] = useState(24);
+  const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [picked, setPicked] = useState<Record<string, { distributorId: string; variantId: string }>>({});
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const busy = useRef(false);
+  const cart = useB2BCart();
 
   useEffect(() => {
     setCategory(search.category ?? "all");
@@ -67,6 +77,82 @@ function RetailerShop() {
     if (sort === "moq") rows = [...rows].sort((a, b) => a.moq - b.moq);
     return rows;
   }, [query, category, brand, distributor, sort]);
+
+  const shown = results.slice(0, visible);
+  const bestOffer = (id: string) => {
+    const p = B2B_PRODUCTS.find((x) => x.id === id);
+    if (!p) return null;
+    const offers = availableOffers(p);
+    return (
+      offers.find((o) => o.distributorId === (distributor === "all" ? "" : distributor)) ||
+      [...offers].sort((a, b) => a.price - b.price)[0] ||
+      null
+    );
+  };
+  const lineFor = (id: string) => {
+    const p = B2B_PRODUCTS.find((x) => x.id === id);
+    const pick = picked[id];
+    if (!p || !pick) return null;
+    const offer = availableOffers(p).find((o) => o.distributorId === pick.distributorId);
+    if (!offer) return { p, offer, qty: 0, q: null };
+    const base = quoteProduct(p, offer, pick.variantId);
+    const qty = qtys[id] ?? base.variant.moq;
+    return { p, offer, qty, q: quoteProduct(p, offer, pick.variantId, qty) };
+  };
+  const visiblePicked = shown.filter((p) => picked[p.id]);
+  const selectedTotal = visiblePicked.reduce((s, p) => {
+    const l = lineFor(p.id);
+    return s + (l?.q ? l.q.unitPrice * l.qty : 0);
+  }, 0);
+  const selectable = shown
+    .map((p) => {
+      const o = bestOffer(p.id);
+      return o ? { id: p.id, distributorId: o.distributorId, variantId: "standard" } : null;
+    })
+    .filter((x): x is { id: string; distributorId: string; variantId: string } => !!x);
+  const allSelected = selectable.length > 0 && selectable.every((x) => picked[x.id]);
+  function toggleAll() {
+    setPicked((prev) => {
+      const next = { ...prev };
+      for (const x of selectable) {
+        if (allSelected) delete next[x.id];
+        else next[x.id] = { distributorId: x.distributorId, variantId: x.variantId };
+      }
+      return next;
+    });
+  }
+  function addSelected() {
+    if (busy.current) return;
+    if (!visiblePicked.length) return toast.info("Select products to add to your cart");
+    busy.current = true;
+    try {
+      const lines = visiblePicked.map((p) => lineFor(p.id)!);
+      const pre = lines.filter((l) => !l.offer || !l.q || l.q.error);
+      const { added, failed } = cart.addManyToCart(
+        lines
+          .filter((l) => l.offer && l.q && !l.q.error)
+          .map((l) => ({ product: l.p, qty: l.qty, offer: l.offer, variantId: picked[l.p.id].variantId }))
+      );
+      const problems = [
+        ...pre.map((l) => ({ name: l.p.name, reason: l.q?.error || "Supplier unavailable" })),
+        ...failed,
+      ];
+      if (added.length) {
+        toast.success(`${added.length} product${added.length > 1 ? "s" : ""} added to cart`);
+        setPicked((prev) => {
+          const next = { ...prev };
+          added.forEach((id) => delete next[id]);
+          return next;
+        });
+      }
+      if (problems.length)
+        toast.error(`${problems.length} not added — still selected`, {
+          description: problems.map((p) => `${p.name}: ${p.reason}`).join("\n"),
+        });
+    } finally {
+      setTimeout(() => (busy.current = false), 400);
+    }
+  }
 
   return (
     <div className="wrap business-page">
@@ -135,6 +221,14 @@ function RetailerShop() {
           <option value="price_high">Price: High to Low</option>
           <option value="moq">Lowest MOQ</option>
         </select>
+        <div className="view-toggle" role="group" aria-label="Shop view">
+          <button aria-pressed={layout === "grid"} onClick={() => setLayout("grid")}>
+            <LayoutGrid size={15} /> Grid
+          </button>
+          <button aria-pressed={layout === "list"} onClick={() => setLayout("list")}>
+            <List size={15} /> List
+          </button>
+        </div>
       </div>
 
       {!results.length && (
@@ -154,15 +248,63 @@ function RetailerShop() {
           </button>
         </div>
       )}
-      <div className="wholesale-grid">
-        {results.slice(0, visible).map((p) => (
-          <RetailerProductCard
-            key={p.id + distributor}
-            product={p}
-            preferredDistributorId={distributor === "all" ? undefined : distributor}
-          />
-        ))}
-      </div>
+      <CatalogueSelectionContext.Provider
+        value={{
+          layout,
+          isSelected: (id) => !!picked[id],
+          toggle: (id, distributorId, variantId) =>
+            setPicked((prev) => {
+              const next = { ...prev };
+              if (next[id]) delete next[id];
+              else next[id] = { distributorId, variantId };
+              return next;
+            }),
+          qty: (id) => qtys[id],
+          setQty: (id, v) => setQtys((prev) => ({ ...prev, [id]: v })),
+        }}
+      >
+        {shown.length > 0 && (
+          <div className="selection-bar" role="region" aria-label="Selected products">
+            <label>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                aria-label="Select all displayed products"
+              />
+              Select all ({selectable.length})
+            </label>
+            <span className="sel-summary" aria-live="polite">
+              {visiblePicked.length} selected · <strong>{money(selectedTotal)}</strong>
+            </span>
+            <div className="sel-actions">
+              <button
+                className="outline-button"
+                disabled={!visiblePicked.length}
+                onClick={() => setPicked({})}
+              >
+                Clear selection
+              </button>
+              <button
+                className="solid-button"
+                disabled={!visiblePicked.length}
+                onClick={addSelected}
+              >
+                <ShoppingCart size={15} /> Add Selected to Cart
+              </button>
+            </div>
+          </div>
+        )}
+        <div className={"wholesale-grid" + (layout === "list" ? " list-view" : "")}>
+          {shown.map((p) => (
+            <RetailerProductCard
+              key={p.id + distributor}
+              product={p}
+              preferredDistributorId={distributor === "all" ? undefined : distributor}
+            />
+          ))}
+        </div>
+      </CatalogueSelectionContext.Provider>
 
       {visible < results.length ? (
         <div className="mt-8 flex justify-center">

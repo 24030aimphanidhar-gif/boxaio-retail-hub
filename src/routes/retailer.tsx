@@ -59,8 +59,9 @@ function RetailerLayout() {
     );
   }
 
-  // Access control: only a signed-in retailer (or admin) may see this area.
-  if (!user || (!isRetailer && !isAdmin)) {
+  // Access control: the storefront is open to any signed-in customer; the
+  // management dashboard stays retailer/admin only.
+  if (!user || (!isStorefront && !isRetailer && !isAdmin)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
         <div className="max-w-md rounded-2xl border border-border bg-background p-8 text-center shadow-sm">
@@ -82,7 +83,7 @@ function RetailerLayout() {
     );
   }
 
-  if (!store) {
+  if (!store && !isStorefront) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4 text-center text-sm text-muted-foreground">
         No store is linked to this account yet. Contact BOXAIO support to complete onboarding.
