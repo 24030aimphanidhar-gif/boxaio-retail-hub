@@ -248,15 +248,63 @@ function RetailerShop() {
           </button>
         </div>
       )}
-      <div className="wholesale-grid">
-        {results.slice(0, visible).map((p) => (
-          <RetailerProductCard
-            key={p.id + distributor}
-            product={p}
-            preferredDistributorId={distributor === "all" ? undefined : distributor}
-          />
-        ))}
-      </div>
+      <CatalogueSelectionContext.Provider
+        value={{
+          layout,
+          isSelected: (id) => !!picked[id],
+          toggle: (id, distributorId, variantId) =>
+            setPicked((prev) => {
+              const next = { ...prev };
+              if (next[id]) delete next[id];
+              else next[id] = { distributorId, variantId };
+              return next;
+            }),
+          qty: (id) => qtys[id],
+          setQty: (id, v) => setQtys((prev) => ({ ...prev, [id]: v })),
+        }}
+      >
+        {shown.length > 0 && (
+          <div className="selection-bar" role="region" aria-label="Selected products">
+            <label>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                aria-label="Select all displayed products"
+              />
+              Select all ({selectable.length})
+            </label>
+            <span className="sel-summary" aria-live="polite">
+              {visiblePicked.length} selected · <strong>{money(selectedTotal)}</strong>
+            </span>
+            <div className="sel-actions">
+              <button
+                className="outline-button"
+                disabled={!visiblePicked.length}
+                onClick={() => setPicked({})}
+              >
+                Clear selection
+              </button>
+              <button
+                className="solid-button"
+                disabled={!visiblePicked.length}
+                onClick={addSelected}
+              >
+                <ShoppingCart size={15} /> Add Selected to Cart
+              </button>
+            </div>
+          </div>
+        )}
+        <div className={"wholesale-grid" + (layout === "list" ? " list-view" : "")}>
+          {shown.map((p) => (
+            <RetailerProductCard
+              key={p.id + distributor}
+              product={p}
+              preferredDistributorId={distributor === "all" ? undefined : distributor}
+            />
+          ))}
+        </div>
+      </CatalogueSelectionContext.Provider>
 
       {visible < results.length ? (
         <div className="mt-8 flex justify-center">
