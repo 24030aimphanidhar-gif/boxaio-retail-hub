@@ -83,7 +83,7 @@ function RetailerLayout() {
     );
   }
 
-  if (!store) {
+  if (!store && !isStorefront) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4 text-center text-sm text-muted-foreground">
         No store is linked to this account yet. Contact BOXAIO support to complete onboarding.
