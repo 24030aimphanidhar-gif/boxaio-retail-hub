@@ -9,6 +9,8 @@ export const Route = createFileRoute("/dashboard")({
       { name: "description", content: "Manage your BOXAIO profile, addresses, orders and saved lists." },
       { property: "og:title", content: "My Account | BOXAIO" },
       { property: "og:description", content: "Manage your BOXAIO profile, addresses, orders and saved lists." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,
