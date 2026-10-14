@@ -1911,3 +1911,42 @@ body {
 .detail-delivery-check .unavailable {
   color: #9a432a;
 }
+
+/* Mobile wholesale cards share the same two-column rhythm across storefront pages. */
+@media (max-width: 700px) {
+  .wholesale-header .wholesale-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .wholesale-header .brand { min-width: 0; }
+  .wholesale-actions { gap: 6px; flex-shrink: 0; }
+  .wholesale-actions .icon-link,
+  .wholesale-actions .mobile-toggle { min-width: 36px; min-height: 40px; }
+  .wholesale-header .business-word { padding-left: 4px; letter-spacing: 0; }
+  .wholesale-grid:not(.list-view),
+  .retailer-home-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wholesale-grid.list-view { grid-template-columns: minmax(0, 1fr) !important; }
+  .retail-product-card { min-width: 0; }
+  .retail-product-card .retail-card-body { min-width: 0; flex: 1; }
+  .retail-product-card .market-price { flex-wrap: wrap; gap: 3px 5px; }
+  .retail-product-card .market-price strong { letter-spacing: 0; overflow-wrap: anywhere; }
+  .retail-product-card .market-line-total { flex-basis: 100%; margin-left: 0; font-size: 11px; }
+  .retail-product-card .market-quantity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .retail-product-card .market-quantity .quantity-stepper { min-width: 0; width: 94px !important; height: 36px; }
+  .retail-product-card .market-quantity .quantity-stepper button { height: 34px !important; width: 30px !important; }
+  .retail-product-card .market-actions > button { min-height: 40px; }
+  .retail-product-card .market-card-footer { flex-wrap: wrap; gap: 2px 6px; }
+  .retail-product-card .market-card-footer > a { overflow-wrap: anywhere; }
+  .retail-product-card.list-layout .retail-card-photo { width: 96px; flex-basis: 96px; margin: 0; }
+  .wholesale-shop-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .wholesale-shop-filters > div:first-child { grid-column: 1 / -1; min-width: 0; }
+  .wholesale-shop-filters select { width: 100%; min-width: 0; max-width: 100%; }
+  .wholesale-shop-filters .view-toggle { grid-column: 1 / -1; justify-self: start; }
+  .selection-bar { top: 64px; gap: 8px; padding: 10px; }
+  .selection-bar .sel-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .selection-bar .sel-actions > button { min-height: 40px; white-space: normal; }
+}

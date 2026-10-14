@@ -2,7 +2,7 @@ import {appPath} from '@/lib/paths';
 import { MobileNavigation } from "@/features/shared/components/MobileNavigation";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { ArrowUpRight, Heart, Box as Leaf, Menu, ShoppingBag, Store, X } from "lucide-react";
+import { ArrowUpRight, Heart, Box as Leaf, Menu, ShoppingBag, Store, UserRound, X } from "lucide-react";
 import { useB2BCart } from "@/retailer/b2b/CartContext";
 import { useRetailerSession } from "@/retailer/hooks";
 const links = [
@@ -36,6 +36,14 @@ export function RetailerNavbar() {
             <small>Wholesale marketplace · demo</small>
           </span>
           <div className="wholesale-actions">
+            <Link
+              to="/dashboard"
+              className="icon-link customer-account-link"
+              aria-label="Customer account"
+              title="Customer account"
+            >
+              <UserRound size={20} />
+            </Link>
             <Link to="/retailer/dashboard" className="outline-button">
               <Store size={16} /> My store <ArrowUpRight size={13} />
             </Link>
@@ -76,7 +84,7 @@ export function RetailerNavbar() {
               </Link>
             ))}
           </nav>
-          <Link to="/" className="shop-home-link">
+          <Link to="/home" className="shop-home-link">
             Customer shop <ArrowUpRight size={13} />
           </Link>
         </div>

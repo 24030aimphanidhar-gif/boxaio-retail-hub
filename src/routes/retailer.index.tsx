@@ -21,6 +21,16 @@ import {
 import { useAsync, useRetailerSession } from "@/retailer/hooks";
 
 export const Route = createFileRoute("/retailer/")({
+  head: () => ({
+    meta: [
+      { title: "Wholesale Marketplace | BOXAIO Business" },
+      { name: "description", content: "Shop wholesale groceries, discover distributors and reorder your BOXAIO business essentials." },
+      { property: "og:title", content: "Wholesale Marketplace | BOXAIO Business" },
+      { property: "og:description", content: "Shop wholesale groceries, discover distributors and reorder your BOXAIO business essentials." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: RetailerStorefrontHome,
 });
 
@@ -35,7 +45,7 @@ function RetailerStorefrontHome() {
   const featured = B2B_PRODUCTS.filter((p) => p.offer).slice(0, 4);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="retailer-storefront mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8">
       <Link
         to="/retailer/dashboard"
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
@@ -108,7 +118,7 @@ function RetailerStorefrontHome() {
               My Product Catalogue <ArrowRight className="size-3.5" />
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="retailer-home-products grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
             {frequent.map((e) => (
               <RetailerCatalogueCard key={e.productId} entry={e} />
             ))}
@@ -137,7 +147,7 @@ function RetailerStorefrontHome() {
             View all <ArrowRight className="size-3.5" />
           </Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="retailer-home-products grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           {featured.map((p) => (
             <RetailerProductCard key={p.id} product={p} />
           ))}
