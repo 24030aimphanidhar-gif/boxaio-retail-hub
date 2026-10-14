@@ -84,7 +84,7 @@ export function RetailerNavbar() {
               </Link>
             ))}
           </nav>
-          <Link to="/home" className="shop-home-link">
+          <Link to="/products" className="shop-home-link">
             Customer shop <ArrowUpRight size={13} />
           </Link>
         </div>
