@@ -1,5 +1,6 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Store } from "lucide-react";
+import { ChevronLeft, ChevronRight, Store } from "lucide-react";
 
 import {
   B2B_BRANDS,
@@ -14,7 +15,8 @@ import {
 /**
  * Shared section chrome for the retailer storefront browse rails so Category,
  * Brand and Distributor look like one family (same heading, "View all →",
- * horizontal scroll, spacing and radius).
+ * horizontal scroll with arrow controls, spacing and radius). Each rail keeps
+ * its own scroll state, so the sections scroll independently.
  */
 function Rail({
   eyebrow,
@@ -25,6 +27,38 @@ function Rail({
   title: string;
   children: React.ReactNode;
 }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(max > 1 && el.scrollLeft < max - 1);
+  }, []);
+
+  useEffect(() => {
+    updateArrows();
+    const el = scrollerRef.current;
+    if (!el) return;
+    const onResize = () => updateArrows();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [updateArrows]);
+
+  function scrollByCard(direction: -1 | 1) {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.firstElementChild as HTMLElement | null;
+    const step = card ? card.offsetWidth + 16 : el.clientWidth * 0.8;
+    el.scrollBy({ left: direction * step, behavior: "smooth" });
+  }
+
+  const arrowClass =
+    "flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all hover:border-primary/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground";
+
   return (
     <section className="mt-10">
       <div className="mb-4 flex items-end justify-between gap-3">
@@ -41,8 +75,32 @@ function Rail({
           View all <ChevronRight className="size-4" />
         </Link>
       </div>
-      <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {children}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className={arrowClass}
+          aria-label={"Scroll " + title + " left"}
+          disabled={!canScrollLeft}
+          onClick={() => scrollByCard(-1)}
+        >
+          <ChevronLeft className="size-4" />
+        </button>
+        <div
+          ref={scrollerRef}
+          onScroll={updateArrows}
+          className="flex min-w-0 flex-1 gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [scroll-behavior:smooth] [&::-webkit-scrollbar]:hidden"
+        >
+          {children}
+        </div>
+        <button
+          type="button"
+          className={arrowClass}
+          aria-label={"Scroll " + title + " right"}
+          disabled={!canScrollRight}
+          onClick={() => scrollByCard(1)}
+        >
+          <ChevronRight className="size-4" />
+        </button>
       </div>
     </section>
   );
