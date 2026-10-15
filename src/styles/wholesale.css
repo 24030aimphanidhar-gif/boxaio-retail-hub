@@ -856,13 +856,59 @@
 .card-select { position: absolute; bottom: 8px; left: 8px; z-index: 3; background: #fff; border-radius: 6px; padding: 4px; display: flex; box-shadow: 0 1px 4px #0002; }
 .retail-product-card.is-selected { outline: 2px solid #2f7d32; outline-offset: -2px; }
 .market-line-total { margin-left: 8px; font-style: normal; font-size: 12px; color: #2f7d32; font-weight: 600; }
-.wholesale-grid.list-view { grid-template-columns: 1fr; gap: 12px; }
+.wholesale-grid.list-view { grid-template-columns: 1fr; gap: 10px; }
 .retail-product-card.list-layout { flex-direction: row; align-items: stretch; }
 .retail-product-card.list-layout:hover { transform: none; }
-.retail-product-card.list-layout .retail-card-photo { width: 170px; flex: 0 0 170px; height: auto; min-height: 150px; margin: 10px; }
-.retail-product-card.list-layout .retail-card-body { flex: 1; min-width: 0; }
+.retail-product-card.list-layout .retail-card-photo { width: 150px; flex: 0 0 150px; height: auto; min-height: 112px; margin: 8px; }
+.retail-product-card.list-layout .retail-card-body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 460px) auto auto auto;
+  justify-content: space-between;
+  grid-template-rows: repeat(3, auto) auto;
+  grid-template-areas:
+    "brand price qty actions"
+    "title price qty actions"
+    "rating price qty actions"
+    "footer footer footer footer";
+  column-gap: 22px;
+  row-gap: 1px;
+  align-items: center;
+  padding: 9px 14px;
+}
+.retail-product-card.list-layout .market-brand { grid-area: brand; line-height: 1.4; }
+.retail-product-card.list-layout .retail-card-title {
+  grid-area: title;
+  height: auto;
+  min-height: 0;
+  margin: 1px 0;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.retail-product-card.list-layout .market-rating { grid-area: rating; margin: 0; }
+.retail-product-card.list-layout .market-rating .market-unit { margin-left: 6px; max-width: none; }
+.retail-product-card.list-layout .market-price { grid-area: price; margin: 0; min-height: 0; }
+.retail-product-card.list-layout .market-quantity { grid-area: qty; margin: 0; gap: 8px; }
+.retail-product-card.list-layout .market-actions { grid-area: actions; margin: 0; display: flex; gap: 6px; }
+.retail-product-card.list-layout .market-add,
+.retail-product-card.list-layout .market-buy { padding: 7px 12px; min-height: 32px; white-space: nowrap; }
+.retail-product-card.list-layout .market-card-footer { grid-area: footer; margin: 0; padding-top: 5px; }
 @media (max-width: 640px) {
   .selection-bar { flex-direction: column; align-items: stretch; top: 60px; }
   .selection-bar .sel-actions { flex-direction: column; }
-  .retail-product-card.list-layout .retail-card-photo { width: 110px; flex-basis: 110px; min-height: 110px; }
+  .retail-product-card.list-layout .retail-card-photo { width: 104px; flex-basis: 104px; min-height: 104px; }
+  .retail-product-card.list-layout .retail-card-body {
+    column-gap: 10px;
+    row-gap: 3px;
+    padding: 8px 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand brand"
+      "title title"
+      "rating rating"
+      "price qty"
+      "actions actions"
+      "footer footer";
+  }
 }
