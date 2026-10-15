@@ -864,7 +864,8 @@
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 460px) auto auto auto;
+  justify-content: space-between;
   grid-template-rows: repeat(3, auto) auto;
   grid-template-areas:
     "brand price qty actions"
@@ -886,6 +887,7 @@
   line-height: 1.35;
 }
 .retail-product-card.list-layout .market-rating { grid-area: rating; margin: 0; }
+.retail-product-card.list-layout .market-rating .market-unit { margin-left: 6px; max-width: none; }
 .retail-product-card.list-layout .market-price { grid-area: price; margin: 0; min-height: 0; }
 .retail-product-card.list-layout .market-quantity { grid-area: qty; margin: 0; gap: 8px; }
 .retail-product-card.list-layout .market-actions { grid-area: actions; margin: 0; display: flex; gap: 6px; }
