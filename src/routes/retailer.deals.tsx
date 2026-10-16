@@ -119,7 +119,8 @@ function WholesaleDeals() {
     }
   }
 
-  const gridClasses = "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+  const gridClasses =
+    "retailer-home-products grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
